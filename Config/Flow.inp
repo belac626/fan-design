@@ -1,0 +1,10 @@
+[flow]
+r: 0.5
+phi: 0.4
+psi: None
+rpm: 15000
+alpha1 = 0
+
+[stage]
+rootRadius: 2
+tipRadius: 3
