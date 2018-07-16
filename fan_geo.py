@@ -60,6 +60,8 @@ class Airfoil():
 
     def __init__(self):
         """Instantiate airfoil properties."""
+        self.plotAirfoil = False
+
         self.z = 0
         self.hub = 0
         self.df = 0
@@ -185,17 +187,26 @@ class Airfoil():
                                      xt=self.xt, yt=self.yt, kt=self.kt,
                                      cle=self.cle, cte=self.cte, rle=self.rle,
                                      blade=blade, station=station)
-
-        u.CreateAirfoilFile(filename=blade + '_' + station, plot=False,
+        airfoil_name = blade + '_' + station
+        u.CreateAirfoilFile(filename=airfoil_name, plot=False,
                             xc=self.xc, yc=self.yc, kc=self.kc, bc=self.bc,
                             xt=self.xt, yt=self.yt, kt=self.kt, bt=self.bt,
                             cle=self.cle, cte=self.cte,
                             rle=self.rle, wte=self.wte)
 
-        self.polar = xf.find_coefficients(airfoil=blade + '_' + station,
+        self.polar = xf.find_coefficients(airfoil=airfoil_name,
                                           alpha=self.aoa, Reynolds=self.Re,
                                           iteration=500, echo=False,
                                           NACA=False, delete=True, PANE=True)
+
+        if self.plotAirfoil:
+            alphas = list(range(0, m.ceil(self.aoa)))
+            self.polars = xf.find_coefficients(airfoil=airfoil_name,
+                                               alpha=alphas,
+                                               Reynolds=self.Re,
+                                               iteration=500, echo=False,
+                                               NACA=False, delete=True,
+                                               PANE=True)
 
 
 class Blade():
@@ -203,9 +214,15 @@ class Blade():
 
     def __init__(self):
         """Instantiate blade properties."""
+        self.plot = False
+
         self.root = Airfoil()
         self.mean = Airfoil()
         self.tip = Airfoil()
+
+        self.root.plotAirfoil = self.plot
+        self.mean.plotAirfoil = self.plot
+        self.tip.plotAirfoil = self.plot
         self.z = 0
 
     def GetBladeConfig(self, filename: str):
