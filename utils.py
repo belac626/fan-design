@@ -2,16 +2,11 @@
 import math as m
 from math import degrees as d
 from math import radians as r
-from pprint import pprint  # noqa W0611
 
-# from aeropy (not relying on aeropy, copied xfoil_module into my dir)
-import bezier  # noqa W0611
-import matplotlib.pyplot as plt  # noqa W0611
+import matplotlib.pyplot as plt
 import numpy as np
 import pylab as pl
 from matplotlib import collections as mc
-
-# BEZIER = True  # use bezier library for xfoil file instead of calculating
 
 
 def Cot(rad):
@@ -479,7 +474,7 @@ def CreateAirfoilFile(filename: str, plot: bool,  # noqa R701
     dc = {'xC': [], 'xT': [], 'yC': [], 'yT': []}
 
     # Get x, y coordinates and slopes for LE and TE of T and C bezier curves
-    n_points = 75
+    n_points = 80
     for i in range(0, n_points + 1):
         x = (1 - m.cos(i*m.pi/n_points))/2
         c['x'].append(x)
@@ -543,6 +538,7 @@ def CreateAirfoilFile(filename: str, plot: bool,  # noqa R701
         plt.scatter(c['x'], c['yT'], color='blue', marker='^')
         plt.scatter(xu, yu, color='green')
         plt.scatter(xl, yl, color='green')
+        plt.axis('equal')
         plt.show()
 
     # Prepare input for aeropy.xfoil_module.prepare_xfoil

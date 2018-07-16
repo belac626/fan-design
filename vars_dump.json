@@ -232,13 +232,13 @@
       "mu": 0.0,
       "Re": 29107.033,
       "polar": {
-        "alpha": null,
-        "CL": null,
-        "CD": null,
-        "CDp": null,
-        "CM": null,
-        "Top_Xtr": null,
-        "Bot_Xtr": null
+        "alpha": 13.813,
+        "CL": 0.459,
+        "CD": 0.168,
+        "CDp": 0.155,
+        "CM": -0.022,
+        "Top_Xtr": 0.619,
+        "Bot_Xtr": 1.0
       },
       "psi_opt": 0
     },
@@ -278,13 +278,13 @@
       "mu": 0.0,
       "Re": 69247.51,
       "polar": {
-        "alpha": null,
-        "CL": null,
-        "CD": null,
-        "CDp": null,
-        "CM": null,
-        "Top_Xtr": null,
-        "Bot_Xtr": null
+        "alpha": 16.87,
+        "CL": 1.408,
+        "CD": 0.082,
+        "CDp": 0.073,
+        "CM": -0.013,
+        "Top_Xtr": 0.132,
+        "Bot_Xtr": 1.0
       },
       "psi_opt": 0
     },
@@ -324,13 +324,13 @@
       "mu": 0.0,
       "Re": 170439.405,
       "polar": {
-        "alpha": null,
-        "CL": null,
-        "CD": null,
-        "CDp": null,
-        "CM": null,
-        "Top_Xtr": null,
-        "Bot_Xtr": null
+        "alpha": 19.083,
+        "CL": 0.88,
+        "CD": 0.221,
+        "CDp": 0.218,
+        "CM": -0.119,
+        "Top_Xtr": 0.069,
+        "Bot_Xtr": 1.0
       },
       "psi_opt": 0
     }
@@ -372,13 +372,13 @@
       "mu": 0.0,
       "Re": 77618.755,
       "polar": {
-        "alpha": null,
-        "CL": null,
-        "CD": null,
-        "CDp": null,
-        "CM": null,
-        "Top_Xtr": null,
-        "Bot_Xtr": null
+        "alpha": 13.816,
+        "CL": 0.475,
+        "CD": 0.148,
+        "CDp": 0.14,
+        "CM": 0.0,
+        "Top_Xtr": 0.322,
+        "Bot_Xtr": 1.0
       },
       "psi_opt": 0
     },
@@ -418,13 +418,13 @@
       "mu": 0.0,
       "Re": 184660.026,
       "polar": {
-        "alpha": null,
-        "CL": null,
-        "CD": null,
-        "CDp": null,
-        "CM": null,
-        "Top_Xtr": null,
-        "Bot_Xtr": null
+        "alpha": 16.888,
+        "CL": 1.415,
+        "CD": 0.069,
+        "CDp": 0.062,
+        "CM": -0.018,
+        "Top_Xtr": 0.188,
+        "Bot_Xtr": 1.0
       },
       "psi_opt": 0
     },
@@ -464,13 +464,13 @@
       "mu": 0.0,
       "Re": 454505.08,
       "polar": {
-        "alpha": null,
-        "CL": null,
-        "CD": null,
-        "CDp": null,
-        "CM": null,
-        "Top_Xtr": null,
-        "Bot_Xtr": null
+        "alpha": 19.126,
+        "CL": 1.547,
+        "CD": 0.103,
+        "CDp": 0.097,
+        "CM": -0.059,
+        "Top_Xtr": 0.055,
+        "Bot_Xtr": 1.0
       },
       "psi_opt": 0
     }

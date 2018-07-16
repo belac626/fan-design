@@ -193,9 +193,9 @@ class Airfoil():
                             rle=self.rle, wte=self.wte)
 
         self.polar = xf.find_coefficients(airfoil=blade + '_' + station,
-                                          alpha=self.aoa,
-                                          Reynolds=self.Re, iteration=50,
-                                          NACA=False, delete=False, PANE=True)
+                                          alpha=self.aoa, Reynolds=self.Re,
+                                          iteration=500, echo=False,
+                                          NACA=False, delete=True, PANE=True)
 
 
 class Blade():
