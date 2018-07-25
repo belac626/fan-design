@@ -17,6 +17,12 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# Pycache directory
+\__pycache__
+
+# Code output directory
+\Output
+
 # =========================
 # Operating System Files
 # =========================
