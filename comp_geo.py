@@ -1,8 +1,9 @@
 """Determines compressor blade geometry."""
-import os
-import utils as u
 import math as m
+import os
 from configparser import ConfigParser
+
+import utils as u
 
 
 ################################
@@ -62,7 +63,7 @@ class Airfoil():
         """Read .inp file."""
         cfp = ConfigParser()
 
-        os.chdir('.\Config')
+        os.chdir(r'.\Config')
         cfp.read(filename)
 
         self.N = cfp.getfloat('blade', 'N')

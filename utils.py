@@ -1,17 +1,18 @@
 """Airfoil calculation functions."""
 import math as m
-from math import degrees as d
 from math import radians as r
 
-import matplotlib.pyplot as plt
 import numpy as np
-import pylab as pl
-from matplotlib import collections as mc
 
 
 def Cot(rad):
     """Return Cotangent of an angle in radians."""
     return m.cos(rad)/m.sin(rad)
+
+
+def Sec(rad):
+    """Return Secant of an angle in radians."""
+    return 1/m.cos(rad)
 
 
 def GetRootFlowVars(stage, blade: str, station: str):
@@ -284,21 +285,20 @@ def CamberBezier(xc, yc, kc, cle, cte, rle):
             xlc2 = xc - m.sqrt((2/3)*(bci - yc)/(kc))
 
             if xlc2 <= 0:
-                print('xc = {xc}'.format(xc=xc))
-                print('yc = {yc}'.format(yc=yc))
-                print('kc = {kc}'.format(kc=round(kc, 4)))
-                print('bc = {bci}'.format(bci=round(bci, 4)))
-                print('x - sqrt((2/3)(b - y)/k) = {xlc2}'.format(xlc2=xlc2))
-                raise ValueError('x - sqrt((2/3)(b - y)/k) = {xlc2}'
-                                 .format(xlc2=xlc2) + ' Invalid Airfoil Shape')
+                print(f'xc = {xc}')
+                print(f'yc = {yc}')
+                print(f'kc = {kc:.4f}')
+                print(f'bc = {bci:.4f}')
+                print(f'x - sqrt((2/3)(b - y)/k) = {xlc2}')
+                raise ValueError(' Invalid Airfoil Shape'
+                                 f'x - sqrt((2/3)(b - y)/k) = {xlc2}')
 
     if bc == 0:
-        print('xc = {xc}'.format(xc=xc))
-        print('yc = {yc}'.format(yc=yc))
-        print('kc = {kc}'.format(kc=round(kc, 4)))
-        print('bc = {bci}'.format(bci=bci_list))
-        raise ValueError('No bc found within bounds 0 < bc < {yc}. \n\
-              '.format(yc=round(yc, 4)))
+        print(f'xc = {xc}'.format(xc=xc))
+        print(f'yc = {yc}'.format(yc=yc))
+        print(f'kc = {kc}'.format(kc=round(kc, 4)))
+        print(f'bc = {bci}'.format(bci=bci_list))
+        raise ValueError(f'No bc found within bounds 0 < bc < {yc: .4f}.')
 
 
 def ThicknessBezier(xt, yt, kt, rle, blade: str, station: str):
@@ -311,40 +311,37 @@ def ThicknessBezier(xt, yt, kt, rle, blade: str, station: str):
             3 * yt**2 + 9 * kt * xt**2 * yt + (27 / 4) * kt**2 * xt**4)
 
     real_troots = [root.real for root in np.roots(poly) if root.imag == 0]
-    min = xt - m.sqrt((-2/3)*(yt/kt))
+    min = max(0, xt - m.sqrt((-2/3)*(yt/kt)))
     bti_list = []
 
     for bti in real_troots:
         bti_list.append(round(bti, 4))
         if not real_troots:
-            print('xt = {xt}'.format(xt=xt))
-            print('yt = {yt}'.format(yt=yt))
-            print('kt = {kt}'.format(kt=round(kt, 4)))
-            raise ValueError('{r} {s} bt is complex. \n\
-                             Invalid Airfoil Shape.'.format(r=blade,
-                                                            s=station))
+            print(f'xt = {xt}')
+            print(f'yt = {yt}')
+            print(f'kt = {kt:.4f}')
+            raise ValueError('Invalid Airfoil Shape.'
+                             f'{blade} {station} bt is complex.')
 
         if bti > max(0, xt - m.sqrt((-2/3)*(yt/kt))) and bti < xt:
             bt = float(bti)
             ylt1 = yt + (3/2)*kt*(xt - bti)**2
 
             if ylt1 <= 0:
-                print('xt = {xt}'.format(xt=xt))
-                print('yt = {yt}'.format(yt=yt))
-                print('kt = {kt}'.format(kt=round(kt, 4)))
-                print('bt = {bti}'.format(bti=round(bti, 4)))
-                print('(y + (3/2)k(x - b)^2) = {ylt1}'.format(ylt1=ylt1))
-                raise ValueError('(y + (3/2)k(x - b)^2) = {ylt1}.'
-                                 .format(ylt1=ylt1) + ' Invalid Airfoil Shape')
+                print(f'xt = {xt}')
+                print(f'yt = {yt}')
+                print(f'kt = {kt:.4f}')
+                print(f'bt = {bti:.4f}')
+                print(f'(y + (3/2)k(x - b)^2) = {ylt1}')
+                raise ValueError(' Invalid Airfoil Shape'
+                                 f'(y + (3/2)k(x - b)^2) = {ylt1}.')
 
     if bt == 0:
-        print('xt = {xt}'.format(xt=xt))
-        print('yt = {yt}'.format(yt=yt))
-        print('kt = {kt}'.format(kt=round(kt, 4)))
-        print('bt = {bti}'.format(bti=bti_list))
-        raise ValueError('No bt found within bounds {min} < bt < {xt}. \n\
-              '.format(min=round(max(0, min), 4),
-                       xt=xt))
+        print(f'xt = {xt}')
+        print(f'yt = {yt}')
+        print(f'kt = {kt:.4f}')
+        print(f'bt = {bti_list}')
+        raise ValueError(f'No bt found within bounds {min:.4f} < bt < {xt}.')
 
 
 def Beziers(xc, yc, kc, xt, yt, kt, cle, cte, rle,  # noqa R701
@@ -367,21 +364,20 @@ def Beziers(xc, yc, kc, xt, yt, kt, cle, cte, rle,  # noqa R701
             xlc2 = xc - m.sqrt((2/3)*(bci - yc)/(kc))
 
             if xlc2 <= 0:
-                print('xc = {xc}'.format(xc=xc))
-                print('yc = {yc}'.format(yc=yc))
-                print('kc = {kc}'.format(kc=round(kc, 4)))
-                print('bc = {bci}'.format(bci=round(bci, 4)))
-                print('x - sqrt((2/3)(b - y)/k) = {xlc2}'.format(xlc2=xlc2))
-                raise ValueError('x - sqrt((2/3)(b - y)/k) = {xlc2}'
-                                 .format(xlc2=xlc2) + ' Invalid Airfoil Shape')
+                print(f'xc = {xc}')
+                print(f'yc = {yc}')
+                print(f'kc = {kc:.4f}')
+                print(f'bc = {bci:.4f}')
+                print(f'x - sqrt((2/3)(b - y)/k) = {xlc2}')
+                raise ValueError('Invalid Airfoil Shape'
+                                 f'x - sqrt((2/3)(b - y)/k) = {xlc2}')
 
     if bc == 0:
-        print('xc = {xc}'.format(xc=xc))
-        print('yc = {yc}'.format(yc=yc))
-        print('kc = {kc}'.format(kc=round(kc, 4)))
-        print('bc = {bci}'.format(bci=bci_list))
-        raise ValueError('No bc found within bounds 0 < bc < {yc}. \n\
-              '.format(yc=round(yc, 4)))
+        print(f'xc = {xc}')
+        print(f'yc = {yc}')
+        print(f'kc = {kc:.4f}')
+        print(f'bc = {bci_list}')
+        raise ValueError(f'No bc found within bounds 0 < bc < {yc: .4f}.')
 
     poly = ((27 / 4) * kt**2,
             -27 * kt**2 * xt,
@@ -390,162 +386,36 @@ def Beziers(xc, yc, kc, xt, yt, kt, cle, cte, rle,  # noqa R701
             3 * yt**2 + 9 * kt * xt**2 * yt + (27 / 4) * kt**2 * xt**4)
 
     real_troots = [root.real for root in np.roots(poly) if root.imag == 0]
-    min = xt - m.sqrt((-2/3)*(yt/kt))
+    min = max(0, xt - m.sqrt((-2/3)*(yt/kt)))
     bti_list = []
 
     for bti in real_troots:
         bti_list.append(round(bti, 4))
         if not real_troots:
-            print('xt = {xt}'.format(xt=xt))
-            print('yt = {yt}'.format(yt=yt))
-            print('kt = {kt}'.format(kt=round(kt, 4)))
-            raise ValueError('{r} {s} bt is complex. \n\
-                             Invalid Airfoil Shape.'.format(r=blade,
-                                                            s=station))
+            print(f'xt = {xt}')
+            print(f'yt = {yt}')
+            print(f'kt = {kt:.4f}')
+            raise ValueError('Invalid Airfoil Shape.'
+                             f'{blade} {station} bt is complex.')
 
         if bti > max(0, xt - m.sqrt((-2/3)*(yt/kt))) and bti < xt:
             bt = float(bti)
             ylt1 = yt + (3/2)*kt*(xt - bti)**2
 
             if ylt1 <= 0:
-                print('xt = {xt}'.format(xt=xt))
-                print('yt = {yt}'.format(yt=yt))
-                print('kt = {kt}'.format(kt=round(kt, 4)))
-                print('bt = {bti}'.format(bti=round(bti, 4)))
-                print('(y + (3/2)k(x - b)^2) = {ylt1}'.format(ylt1=ylt1))
-                raise ValueError('(y + (3/2)k(x - b)^2) = {ylt1}.'
-                                 .format(ylt1=ylt1) + ' Invalid Airfoil Shape')
+                print(f'xt = {xt}')
+                print(f'yt = {yt}')
+                print(f'kt = {kt:.4f}')
+                print(f'bt = {bti:.4f}')
+                print(f'(y + (3/2)k(x - b)^2) = {ylt1}')
+                raise ValueError('Invalid Airfoil Shape'
+                                 f'(y + (3/2)k(x - b)^2) = {ylt1:.4f}')
 
     if bt == 0:
-        print('xt = {xt}'.format(xt=xt))
-        print('yt = {yt}'.format(yt=yt))
-        print('kt = {kt}'.format(kt=round(kt, 4)))
-        print('bt = {bti}'.format(bti=bti_list))
-        raise ValueError('No bt found within bounds {min} < bt < {xt}. \n\
-              '.format(min=round(max(0, min), 4),
-                       xt=xt))
+        print(f'xt = {xt}')
+        print(f'yt = {yt}')
+        print(f'kt = {kt:.4f}')
+        print(f'bt = {bti_list}')
+        raise ValueError(f'No bt found within bounds {min:.4f} < bt < {xt}.')
 
     return bc, bt
-
-
-def CreateAirfoilFile(filename: str, plot: bool,  # noqa R701
-                      xc, yc, kc, bc,
-                      xt, yt, kt, bt,
-                      cle, cte, rle, wte):
-    """Generate airfoil coordinate file.
-
-    Depends on aeropy.xfoil_module.
-    """
-    bp = {
-        'x': {'LET': [0,
-                      0,
-                      bt,
-                      xt],
-              'TET': [xt,
-                      2*xt - bt,
-                      1 + (0 - (1.5*kt*(xt - bt)**2 + yt))*Cot(r(wte)),
-                      1],
-              'LEC': [0,
-                      bc*Cot(r(cle)),
-                      xc - ((2*(bc - yc))/(3*kc))**0.5,
-                      xc],
-              'TEC': [xc,
-                      xc + ((2*(bc - yc))/(3*kc))**0.5,
-                      1 + (0 - bc)*Cot(r(cte)),
-                      1]},
-        'y': {'LET': [0,
-                      (1.5*kt*(xt - bt)**2 + yt),
-                      yt,
-                      yt],
-              'TET': [yt,
-                      yt,
-                      (1.5*kt*(xt - bt)**2 + yt),
-                      0],
-              'LEC': [0,
-                      bc,
-                      yc,
-                      yc],
-              'TEC': [yc,
-                      yc,
-                      bc,
-                      0]}
-    }
-    c = {'x': [], 'yC': [], 'yT': []}
-    dc = {'xC': [], 'xT': [], 'yC': [], 'yT': []}
-
-    # Get x, y coordinates and slopes for LE and TE of T and C bezier curves
-    n_points = 80
-    for i in range(0, n_points + 1):
-        x = (1 - m.cos(i*m.pi/n_points))/2
-        c['x'].append(x)
-        for j in ['C', 'T']:
-            if j == 'C':
-                xmax = xc
-            elif j == 'T':
-                xmax = xt
-            if x <= xmax:
-                loc = 'LE'
-                bp_xi = bp['x'][loc + j]
-            elif x > xmax:
-                loc = 'TE'
-                bp_xi = bp['x'][loc + j]
-
-            u_x = [-bp_xi[0] + 3*bp_xi[1] - 3*bp_xi[2] + bp_xi[3],
-                   3*bp_xi[0] - 6*bp_xi[1] + 3*bp_xi[2],
-                   -3*bp_xi[0] + 3*bp_xi[1],
-                   bp_xi[0] - x]
-            u = [root.real for root in np.roots(u_x)
-                 if root.imag == 0
-                 and root >= 0
-                 and root <= (1 + 1/(20*n_points))]
-            u = u[0]
-            c['y' + j].append(bp['y'][loc + j][0]*(1 - u)**3
-                              + 3*bp['y'][loc + j][1]*(u)*(1 - u)**2
-                              + 3*bp['y'][loc + j][2]*(u)**2*(1 - u)
-                              + bp['y'][loc + j][3]*(u)**3)
-            for k in ['x', 'y']:
-                dc[k + j].append(bp[k][loc + j][0]*(-3*(1 - u)**2)
-                                 + 3*bp[k][loc + j][1]*(3*u**2 - 4*u + 1)
-                                 + 3*bp[k][loc + j][2]*(-3*u**2 + 2*u)
-                                 + bp[k][loc + j][3]*(3*u**2))
-
-    theta = []
-    xu = []
-    yu = []
-    xl = []
-    yl = []
-    lines = []
-    for i in range(0, len(c['x'])):  # theta[0] is a divide by 0 error
-        theta.append(d(m.atan(dc['yC'][i]/dc['xC'][i])))
-        xu.append(c['x'][i] - c['yT'][i]*m.sin(r(theta[i])))
-        yu.append(c['yC'][i] + c['yT'][i]*m.cos(r(theta[i])))
-        xl.append(c['x'][i] + c['yT'][i]*m.sin(r(theta[i])))
-        yl.append(c['yC'][i] - c['yT'][i]*m.cos(r(theta[i])))
-        lines.append([(xu[i], yu[i]), (xl[i], yl[i])])
-
-    # Organize coordinates so that xfoil can read them
-    xcoord = list(reversed(xu))[:-1] + xl
-    ycoord = list(reversed(yu))[:-1] + yl
-    # Create airfoil file for xfoil
-    with open(filename, 'w') as DataFile:
-        for i in range(len(xcoord)):
-            DataFile.write(f'     {xcoord[i]:.6f}    {ycoord[i]:.6f}\n')
-    if plot:
-        lc = mc.LineCollection(lines)
-        fig, ax = pl.subplots()
-        ax.add_collection(lc)
-        plt.scatter(c['x'], c['yC'], color='red', marker='^')
-        plt.scatter(c['x'], c['yT'], color='blue', marker='^')
-        plt.scatter(xu, yu, color='green')
-        plt.scatter(xl, yl, color='green')
-        plt.axis('equal')
-        plt.show()
-
-    # Prepare input for aeropy.xfoil_module.prepare_xfoil
-    # upper = {'x': xu, 'y': yu}
-    # lower = {'x': xl, 'y': yl}
-    # coord = xf.prepare_xfoil(upper, lower, chord=1, reposition=False)
-    # xcoord = [coord[i][0] for i in range(len(coord))]
-    # ycoord = [coord[i][1] for i in range(len(coord))]
-    # xf.create_input(xcoord, ycoord, filename=filename,
-    #                 different_x_upper_lower=True)

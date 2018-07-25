@@ -1,8 +1,7 @@
 """Determines compressor thermodynamic and flow properties."""
-import os
 import math as m
+import os
 from configparser import ConfigParser
-
 
 ################################
 # #Class: ThermoFlow
@@ -107,7 +106,7 @@ class ThermoFlow():
         """Read .inp file."""
         cfp = ConfigParser()
 
-        os.chdir('.\Config')
+        os.chdir(r'.\Config')
         cfp.read(filename)
 
         self.r = cfp.getfloat('flow', 'r')
@@ -156,7 +155,6 @@ class ThermoFlow():
         self.wt2 = self.w1*m.sin(m.radians(self.beta2))
         self.ct1 = self.c1*m.sin(m.radians(self.alpha1))
         self.ct2 = self.c2*m.sin(m.radians(self.alpha2))
-
 
         # Thermodynamics (converting all english measurements to metric)
         self.M = self.cx*0.0254/m.sqrt(self.gamma*self.R*self.T1)

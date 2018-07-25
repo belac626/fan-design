@@ -1,21 +1,20 @@
 """Used to implement variables in Solidworks Leaf Shredder."""
-import json
 import os
 
 import utils as u
-from write_sw import Solidworks
+import write_file as wf
 
 compressor = False
 
-if not compressor:
-    from fan_flow import Stage
-    from fan_geo import Blade
-else:
+if compressor:
     from comp_thermoflow import Stage
     from comp_geo import Blade
+else:
+    from fan_flow import Stage
+    from fan_geo import Blade
 
 cwd = os.getcwd()
-if compressor is True:
+if compressor:
     stage = Stage()
     stage.GetStageConfig(filename='Comp_Stage.ini')
     stage.CalcStage()
@@ -78,10 +77,10 @@ else:
 
     pod_dict = {
         'Pod chord': 12,
-        'Rotor chord': rotor.root.chord,
-        'Stator chord': stator.root.chord,
-        'ID': stage.root.radius*2,
-        'OD': stage.tip.radius*2,
+        'Rotor chord': rotor.root.chord*0.0254,
+        'Stator chord': stator.root.chord*0.0254,
+        'ID': stage.root.radius*2*0.0254,
+        'OD': stage.tip.radius*2*0.0254,
         'Shaft OD Nom.': 0.5,
         'Shaft OD': '"Shaft OD Nom." + 0.1',
         'Wall Thickness': 0.25,
@@ -109,32 +108,21 @@ os.chdir(r'.\Solidworks\Vars')
 with open('Pod.txt', 'w') as pod:
     output = []
     for key, value in pod_dict.items():
-        line = '"{key}"= {value}'.format(key=key, value=value)
+        line = f'"{key}"= {value}'
         output.append(line)
     output = '\n'.join(output)
     pod.write(output)
 os.chdir(cwd)
 
-rotor_file = Solidworks()
-rotor_file.WriteConfig(stage=stage, blade=rotor,
-                       filename='Rotor.txt')
+rotor_file = wf.Solidworks()
+rotor_file.WriteConfig(stage=stage, blade=rotor, filename='Rotor.txt')
 
-stator_file = Solidworks()
-stator_file.WriteConfig(stage=stage, blade=stator,
-                        filename='Stator.txt')
+stator_file = wf.Solidworks()
+stator_file.WriteConfig(stage=stage, blade=stator, filename='Stator.txt')
 
-with open('vars_dump.json', 'w') as dump:
-    json.dump(json.loads(json.dumps([[stage.root.__dict__,
-                                     stage.mean.__dict__,
-                                     stage.tip.__dict__],
-                                     [igv.root.__dict__,
-                                      igv.mean.__dict__,
-                                      igv.tip.__dict__],
-                                     [rotor.root.__dict__,
-                                     rotor.mean.__dict__,
-                                     rotor.tip.__dict__],
-                                     [stator.root.__dict__,
-                                     stator.mean.__dict__,
-                                     stator.tip.__dict__]]),
-                         parse_float=lambda x: round(float(x), 3)),
-              dump, indent=2)
+wf.DumpVars.Dump_Blade_Csv(filename=r'.\Output\Blade_dump.csv',
+                           rotor=rotor, stator=stator)
+wf.DumpVars.Dump_Stage_Csv(filename=r'.\Output\Stage_dump.csv',
+                           stage=stage)
+wf.DumpVars.Dump_Json(filename=r'.\Output\Vars_dump.json',
+                      stage=stage, igv=igv, rotor=rotor, stator=stator)
