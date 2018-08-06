@@ -139,8 +139,8 @@ class Airfoil():
         os.chdir('..')
 
     def CalcAirfoil(self, stage, blade: str, station: str,
-                    plotAirfoil=False,
-                    plotAirfoilPolar=False):
+                    plotAirfoil=False, plotPolar=False,
+                    plotCp=False, plotSv=False):
         """Calculate Bezier-PARSEC variables and airfoil properties."""
         if station == 'root':
             FlowVars = u.GetRootFlowVars(stage=stage,
@@ -162,14 +162,14 @@ class Airfoil():
 
         self.dh = v2/v1
         self.space = (2*m.pi*radius)/self.z
-        self.chord = stage.span/self.ar
-        self.sigma = self.chord/self.space
-
-        self.df = ((1 - m.cos(r(avle))/m.cos(r(avte)))
-                   + m.cos(avle)/(2*self.sigma)*(m.tan(avle) - m.tan(avte)))
-        # self.sigma = 1/(2*(m.cos(r(avle))/m.cos(r(avte)) - 1 + self.df)
-        #                 / (m.cos(r(avle))*(m.tan(r(avle)) - m.tan(r(avte)))))
-        # self.chord = self.sigma*self.space
+        # self.chord = stage.span/self.ar
+        # self.sigma = self.chord/self.space
+        # self.df = ((1 - m.cos(r(avle))/m.cos(r(avte)))
+        #            + ((m.cos(r(avle))*(m.tan(r(avle)) - m.tan(r(avte))))
+        #               / (2*self.sigma)))
+        self.sigma = ((m.cos(r(avle))*(m.tan(r(avle)) - m.tan(r(avte))))
+                      / (2*(m.cos(r(avle))/m.cos(r(avte)) - 1 + self.df)))
+        self.chord = self.sigma*self.space
 
         # Incidence, deviation, and blade angle calculation
         self.deflection = abs(avle - avte)
@@ -227,8 +227,27 @@ class Airfoil():
                                           alpha=self.aoa, Reynolds=self.Re,
                                           iteration=500, echo=False,
                                           delete=False, NACA=False, PANE=True)
+        self.cp = xf.find_pressure_coefficients(airfoil=airfoil_name,
+                                                alpha=self.aoa, dir=directory,
+                                                Reynolds=self.Re,
+                                                iteration=500, echo=False,
+                                                NACA=False, chord=1.,
+                                                PANE=True, delete=False)
+        self.sv = {'x': list(), 'y': list(), 'v': list()}
+        for i in range(len(self.cp['Cp'])):
+            self.sv['x'].append(self.cp['x'][i])
+            self.sv['y'].append(self.cp['y'][i])
+            self.sv['v'].append(m.sqrt(1 - self.cp['Cp'][i]))
 
-        if plotAirfoilPolar:
+        if plotCp:
+            plt.plot(self.cp['x'], self.cp['Cp'])
+            plt.show()
+
+        if plotSv:
+            plt.plot(self.sv['x'], self.sv['v'])
+            plt.show()
+
+        if plotPolar:
             # Gather multiple angles of attack for airfoil and get polars
             alphas = list(range(-30, 30))
             polars = xf.find_coefficients(airfoil=airfoil_name,
@@ -301,14 +320,15 @@ class Blade():
         os.chdir('..')
 
     def CalcBlade(self, stage, blade: str,
-                  plotAirfoil=False, plotAirfoilPolar=False):
+                  plotAirfoil=False, plotPolar=False,
+                  plotCp=False, plotSv=False):
         """Calculate blade properties."""
         self.root.CalcAirfoil(stage, blade, 'root',
-                              plotAirfoil=plotAirfoil,
-                              plotAirfoilPolar=plotAirfoilPolar)
+                              plotAirfoil=plotAirfoil, plotPolar=plotPolar,
+                              plotCp=plotCp, plotSv=plotSv)
         self.mean.CalcAirfoil(stage, blade, 'mean',
-                              plotAirfoil=plotAirfoil,
-                              plotAirfoilPolar=plotAirfoilPolar)
+                              plotAirfoil=plotAirfoil, plotPolar=plotPolar,
+                              plotCp=plotCp, plotSv=plotSv)
         self.tip.CalcAirfoil(stage, blade, 'tip',
-                             plotAirfoil=plotAirfoil,
-                             plotAirfoilPolar=plotAirfoilPolar)
+                             plotAirfoil=plotAirfoil, plotPolar=plotPolar,
+                             plotCp=plotCp, plotSv=plotSv)

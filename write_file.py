@@ -225,11 +225,9 @@ class DumpVars():
             for bld in blades:
                 for stn in stations:
                     for key, val in blade_dicts[bld][stn].items():
-                        val = round(val, 4)
                         blade_vals[bld][stn].append(val)
                     blade_vals[bld][stn].pop(-6)
                     for key, val in blade_polar_dicts[bld][stn].items():
-                        val = round(val, 4)
                         blade_vals[bld][stn].append(val)
                     data_by_row.append(blade_vals[bld][stn])
             data_by_column = list(zip(*data_by_row))
