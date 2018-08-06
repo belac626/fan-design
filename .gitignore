@@ -19,6 +19,7 @@ $RECYCLE.BIN/
 
 # Pycache directory
 /__pycache__
+*.pyc
 
 # Code output directory
 /Output
