@@ -21,8 +21,9 @@ $RECYCLE.BIN/
 /__pycache__
 *.pyc
 
-# Code output directory
+# Code i/o directories
 /Output
+/Input
 
 # =========================
 # Operating System Files

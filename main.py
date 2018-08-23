@@ -1,6 +1,6 @@
 """Used to implement variables in Solidworks Leaf Shredder."""
 import os
-
+import pathlib as p
 import utils as u
 import write_file as wf
 
@@ -104,8 +104,8 @@ else:
     }
 
 os.chdir('..')
-os.chdir(r'.\Solidworks\Vars')
-with open('Pod.txt', 'w') as pod:
+pod_file = p.Path('Solidworks/Vars/Pod.txt')
+with open(pod_file, 'w') as pod:
     output = []
     for key, value in pod_dict.items():
         line = f'"{key}"= {value}'
@@ -120,9 +120,9 @@ rotor_file.WriteConfig(stage=stage, blade=rotor, filename='Rotor.txt')
 stator_file = wf.Solidworks()
 stator_file.WriteConfig(stage=stage, blade=stator, filename='Stator.txt')
 
-wf.DumpVars.Dump_Blade_Csv(filename=r'.\Output\Blade_dump.csv',
+wf.DumpVars.Dump_Blade_Csv(filename='Blade_dump.csv',
                            rotor=rotor, stator=stator)
-wf.DumpVars.Dump_Stage_Csv(filename=r'.\Output\Stage_dump.csv',
+wf.DumpVars.Dump_Stage_Csv(filename='Stage_dump.csv',
                            stage=stage)
-wf.DumpVars.Dump_Json(filename=r'.\Output\Vars_dump.json',
+wf.DumpVars.Dump_Json(filename='Vars_dump.json',
                       stage=stage, igv=igv, rotor=rotor, stator=stator)

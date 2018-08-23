@@ -1,6 +1,6 @@
 """Determines fan flow and geometric properties."""
 import math as m
-import os
+import pathlib as p
 from configparser import ConfigParser
 from math import degrees as d
 from math import radians as r
@@ -70,9 +70,8 @@ class FanFlow():
     def GetFanFlowConfig(self, filename: str, station: str):
         """Read .ini file."""
         cfp = ConfigParser()
-
-        os.chdir(r'.\Config')
-        cfp.read(filename)  # Fan_Stage.ini
+        file = p.Path(f'Config/{filename}')
+        cfp.read(file)  # Fan_Stage.ini
 
         self.reaction = cfp.getfloat('flow', 'r')
         self.phi = cfp.getfloat('flow', 'phi')
@@ -85,7 +84,6 @@ class FanFlow():
                                   + cfp.getfloat('tip', 'radius')**2)/2)
         else:
             self.radius = cfp.getfloat(station, 'radius')
-        os.chdir('..')
 
     def CalcFanFlow(self, iphi=None):
         """Calculate flow angles."""
@@ -141,14 +139,13 @@ class Stage():
         self.mean.GetFanFlowConfig(filename=filename, station='mean')
         self.tip.GetFanFlowConfig(filename=filename, station='tip')
 
-        os.chdir(r'.\Config')
         cfp = ConfigParser()
-        cfp.read(filename)
+        file = p.Path(f'Config/{filename}')
+        cfp.read(file)
 
         self.rpm = cfp.getfloat('flow', 'rpm')
         self.span = (cfp.getfloat('tip', 'radius')
                      - cfp.getfloat('root', 'radius'))
-        os.chdir('..')
 
     def CalcStage(self):
         """Calculate stage properties (assumes cosntant dcx/dr)."""

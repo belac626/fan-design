@@ -3,6 +3,7 @@ import csv
 import json
 import math as m
 import os
+import pathlib as p
 from math import degrees as d
 from math import radians as r
 
@@ -21,13 +22,10 @@ class Airfoil():
         """Instantiate airfoil properties."""
 
     def CreateFile(filename: str, plot: bool,  # noqa R701
-                          xc, yc, kc, bc,
-                          xt, yt, kt, bt,
-                          cle, cte, rle, wte, dir=''):
-        """Generate airfoil coordinate file.
-
-        Depends on aeropy.xfoil_module.
-        """
+                   xc, yc, kc, bc,
+                   xt, yt, kt, bt,
+                   cle, cte, rle, wte):
+        """Generate airfoil coordinate file."""
         bp = {
             'x': {'LET': [0,
                           0,
@@ -119,9 +117,12 @@ class Airfoil():
         xcoord = list(reversed(xu))[:-1] + xl
         ycoord = list(reversed(yu))[:-1] + yl
         # Create airfoil file for xfoil
-        with open(os.path.join(dir, filename), 'w') as DataFile:
+        os.chdir('Input')
+        with open(filename, 'w') as DataFile:
             for i in range(len(xcoord)):
                 DataFile.write(f'     {xcoord[i]:.6f}    {ycoord[i]:.6f}\n')
+        os.chdir('..')
+
         if plot:
             lc = mc.LineCollection(lines)
             fig, ax = pl.subplots()
@@ -142,16 +143,11 @@ class Solidworks():
         self.cwd = os.getcwd()
         os.chdir('..')
         self.root = os.getcwd()
-        os.chdir(r'.\Solidworks\Vars')
-        self.dir = os.getcwd()
+        self.dir = p.Path('Solidworks/Vars/')
         os.chdir(self.cwd)
-        self.name = ''
 
     def WriteConfig(self, stage, blade, filename):
         """Write Solidworks equation file."""
-        self.name = filename
-        os.chdir(self.dir)
-
         keys = ['Blades', 'ID', 'OD']
         stations = ['root', 'mean', 'tip']
         for s in stations:
@@ -175,14 +171,14 @@ class Solidworks():
                 blade.tip.cle, blade.tip.cte, blade.tip.rle, blade.tip.wte]
         blade_dict = dict(zip(keys, np.round(vars, 4)))
 
-        with open(self.name, 'w') as SWConfig:
+        os.chdir(self.dir)
+        with open(filename, 'w') as SWConfig:
             output = []
             for key, value in blade_dict.items():
                 line = f'"{key}"= {value}'
                 output.append(line)
             output = '\n'.join(output)
             SWConfig.write(output)
-
         os.chdir(self.cwd)
 
 
@@ -194,6 +190,7 @@ class DumpVars():
 
     def Dump_Blade_Csv(filename, rotor, stator):
         """Write blade variables in CSV format."""
+        os.chdir('Output')
         with open(filename, 'w', newline='') as csv_dump:
             blade_vals = {'rotor': {'root': [],
                                     'mean': [],
@@ -239,9 +236,11 @@ class DumpVars():
             writer.writerow(fieldnames)
             for field in data_by_column:
                 writer.writerow(field)
+        os.chdir('..')
 
     def Dump_Stage_Csv(filename, stage):
         """Write stage variables in CSV format."""
+        os.chdir('Output')
         with open(filename, 'w', newline='') as csv_dump:
             stage_vals = {'root': [], 'mean': [], 'tip': []}
             stage_keys = []
@@ -265,9 +264,11 @@ class DumpVars():
             writer.writerow(fieldnames)
             for field in data_by_column:
                 writer.writerow(field)
+        os.chdir('..')
 
     def Dump_Json(filename, stage, igv, rotor, stator):
         """Write variables in JSON format."""
+        os.chdir('Output')
         with open(filename, 'w') as json_dump:
             json.dump(json.loads(json.dumps([[stage.root.__dict__,
                                              stage.mean.__dict__,
@@ -283,3 +284,4 @@ class DumpVars():
                                              stator.tip.__dict__]]),
                                  parse_float=lambda x: round(float(x), 3)),
                       json_dump, indent=2)
+        os.chdir('..')

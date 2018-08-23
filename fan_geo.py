@@ -1,6 +1,6 @@
 """Determines compressor blade geometry."""
 import math as m
-import os
+import pathlib as p
 from configparser import ConfigParser
 from math import degrees as d
 from math import radians as r
@@ -122,9 +122,8 @@ class Airfoil():
     def GetAirfoilConfig(self, filename: str, station: str):
         """Read .ini file."""
         cfp = ConfigParser()
-
-        os.chdir(r'.\Config')
-        cfp.read(filename)
+        file = p.Path(f'Config/{filename}')
+        cfp.read(file)
 
         self.z = cfp.getfloat('blade', 'z')
         self.hub = cfp.getfloat('blade', 'hub')
@@ -135,8 +134,6 @@ class Airfoil():
         self.ycr = cfp.getfloat(station, 'ycr')
         self.xt = cfp.getfloat(station, 'xt')
         self.yt = cfp.getfloat(station, 'yt')
-
-        os.chdir('..')
 
     def CalcAirfoil(self, stage, blade: str, station: str,
                     plotAirfoil=False, plotPolar=False,
@@ -215,8 +212,7 @@ class Airfoil():
                                      blade=blade, station=station)
         airfoil_name = blade + '_' + station
         directory = r'.\Output'
-        wf.Airfoil.CreateFile(filename=airfoil_name, dir=directory,
-                              plot=plotAirfoil,
+        wf.Airfoil.CreateFile(filename=airfoil_name, plot=plotAirfoil,
                               xc=self.xc, yc=self.yc, kc=self.kc, bc=self.bc,
                               xt=self.xt, yt=self.yt, kt=self.kt, bt=self.bt,
                               cle=self.cle, cte=self.cte,
@@ -310,14 +306,12 @@ class Blade():
         self.mean.GetAirfoilConfig(filename, 'mean')
         self.tip.GetAirfoilConfig(filename, 'tip')
 
-        os.chdir(r'.\Config')
         cfp = ConfigParser()
-        cfp.read(filename)
+        file = p.Path(f'Config/{filename}')
+        cfp.read(file)
 
         self.z = cfp.getfloat('blade', 'z')
         self.hub = cfp.getfloat('blade', 'hub')
-
-        os.chdir('..')
 
     def CalcBlade(self, stage, blade: str,
                   plotAirfoil=False, plotPolar=False,
