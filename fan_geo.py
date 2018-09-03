@@ -1,6 +1,6 @@
 """Determines compressor blade geometry."""
 import math as m
-import pathlib as p
+import pathlib as pth
 from configparser import ConfigParser
 from math import degrees as d
 from math import radians as r
@@ -122,7 +122,7 @@ class Airfoil():
     def GetAirfoilConfig(self, filename: str, station: str):
         """Read .ini file."""
         cfp = ConfigParser()
-        file = p.Path(f'Config/{filename}')
+        file = pth.Path(f'Config/{filename}')
         cfp.read(file)
 
         self.z = cfp.getfloat('blade', 'z')
@@ -211,7 +211,6 @@ class Airfoil():
                                      cle=self.cle, cte=self.cte, rle=self.rle,
                                      blade=blade, station=station)
         airfoil_name = blade + '_' + station
-        directory = r'.\Output'
         wf.Airfoil.CreateFile(filename=airfoil_name, plot=plotAirfoil,
                               xc=self.xc, yc=self.yc, kc=self.kc, bc=self.bc,
                               xt=self.xt, yt=self.yt, kt=self.kt, bt=self.bt,
@@ -219,12 +218,14 @@ class Airfoil():
                               rle=self.rle, wte=self.wte)
 
         self.Re = self.rho*v1*self.chord/self.mu
-        self.polar = xf.find_coefficients(airfoil=airfoil_name, dir=directory,
-                                          alpha=self.aoa, Reynolds=self.Re,
-                                          iteration=500, echo=False,
-                                          delete=False, NACA=False, PANE=True)
+        self.polar = xf.find_coefficients(airfoil=airfoil_name, indir='Input',
+                                          outdir='Output', alpha=self.aoa,
+                                          Reynolds=self.Re, iteration=500,
+                                          echo=False, delete=False, NACA=False,
+                                          PANE=True)
         self.cp = xf.find_pressure_coefficients(airfoil=airfoil_name,
-                                                alpha=self.aoa, dir=directory,
+                                                alpha=self.aoa, indir='Input',
+                                                outdir='Output',
                                                 Reynolds=self.Re,
                                                 iteration=500, echo=False,
                                                 NACA=False, chord=1.,
@@ -232,7 +233,7 @@ class Airfoil():
         self.sv = {'x': list(), 'y': list(), 'v': list()}
         for i in range(len(self.cp['Cp'])):
             self.sv['x'].append(self.cp['x'][i])
-            self.sv['y'].append(self.cp['y'][i])
+            # self.sv['y'].append(self.cp['y'][i])
             self.sv['v'].append(m.sqrt(1 - self.cp['Cp'][i]))
 
         if plotCp:
@@ -307,7 +308,7 @@ class Blade():
         self.tip.GetAirfoilConfig(filename, 'tip')
 
         cfp = ConfigParser()
-        file = p.Path(f'Config/{filename}')
+        file = pth.Path(f'Config/{filename}')
         cfp.read(file)
 
         self.z = cfp.getfloat('blade', 'z')

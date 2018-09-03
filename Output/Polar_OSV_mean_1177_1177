@@ -1,5 +1,5 @@
   
-       XFOIL         Version 6.99
+       XFOIL         Version 6.97
   
  Calculated polar for: OSV_mean                                        
   
@@ -10,4 +10,3 @@
   
    alpha    CL        CD       CDp       CM     Top_Xtr  Bot_Xtr
   ------ -------- --------- --------- -------- -------- --------
-  11.769   0.4123   0.14382   0.13282  -0.0174   0.5483   1.0000

@@ -3,7 +3,7 @@ import csv
 import json
 import math as m
 import os
-import pathlib as p
+import pathlib as pth
 from math import degrees as d
 from math import radians as r
 
@@ -141,10 +141,10 @@ class Solidworks():
     def __init__(self):
         """Instantiate file properties."""
         self.cwd = os.getcwd()
-        os.chdir('..')
-        self.root = os.getcwd()
-        self.dir = p.Path('Solidworks/Vars/')
-        os.chdir(self.cwd)
+        # os.chdir('..')
+        # self.root = os.getcwd()
+        self.dir = pth.Path('../Solidworks/Vars/')
+        # os.chdir(self.cwd)
 
     def WriteConfig(self, stage, blade, filename):
         """Write Solidworks equation file."""

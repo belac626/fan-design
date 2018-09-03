@@ -1,13 +1,13 @@
   
-       XFOIL         Version 6.99
+       XFOIL         Version 6.97
   
  Calculated polar for: Rotor_root                                      
   
  1 1 Reynolds number fixed          Mach number fixed         
   
  xtrf =   1.000 (top)        1.000 (bottom)  
- Mach =   0.000     Re =     0.011 e 6     Ncrit =   9.000
+ Mach =   0.000     Re =     0.008 e 6     Ncrit =   9.000
   
    alpha    CL        CD       CDp       CM     Top_Xtr  Bot_Xtr
   ------ -------- --------- --------- -------- -------- --------
-   7.343   0.1954   0.08374   0.05984   0.0176   1.0000   1.0000
+   7.340   0.1970   0.08681   0.05989   0.0186   1.0000   1.0000

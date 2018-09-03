@@ -1,6 +1,6 @@
 """Determines fan flow and geometric properties."""
 import math as m
-import pathlib as p
+import pathlib as pth
 from configparser import ConfigParser
 from math import degrees as d
 from math import radians as r
@@ -70,7 +70,7 @@ class FanFlow():
     def GetFanFlowConfig(self, filename: str, station: str):
         """Read .ini file."""
         cfp = ConfigParser()
-        file = p.Path(f'Config/{filename}')
+        file = pth.Path(f'Config/{filename}')
         cfp.read(file)  # Fan_Stage.ini
 
         self.reaction = cfp.getfloat('flow', 'r')
@@ -140,7 +140,7 @@ class Stage():
         self.tip.GetFanFlowConfig(filename=filename, station='tip')
 
         cfp = ConfigParser()
-        file = p.Path(f'Config/{filename}')
+        file = pth.Path(f'Config/{filename}')
         cfp.read(file)
 
         self.rpm = cfp.getfloat('flow', 'rpm')
