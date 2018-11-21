@@ -67,7 +67,7 @@ class FanFlow():
         self.ct1 = 0
         self.ct2 = 0
 
-    def GetFanFlowConfig(self, filename: str, station: str):
+    def GetFanFlowConfig(self, filename:str, station:str):
         """Read .ini file."""
         cfp = ConfigParser()
         file = pth.Path(f'Config/{filename}')
