@@ -1,17 +1,4 @@
 """Determines compressor blade geometry."""
-import math as m
-from math import degrees as d
-from math import radians as r
-import pathlib as pth
-from configparser import ConfigParser
-from dataclasses import dataclass
-from typing import ClassVar, Dict
-
-import matplotlib.pyplot as plt
-
-import utils as ut
-import write_file as wf
-from aeropy import xfoil_module as xf
 
 # pylint: disable=R0902
 # - allow more than 7 instance variables
@@ -23,6 +10,22 @@ from aeropy import xfoil_module as xf
 # - allow more than 50 statemnts in class or function
 # pylint: disable=C0103
 # - allow variable names less than 3 characters
+# pylint: disable=C0412
+# - allow imports to be sorted by isort and not grouped
+
+import math as m
+import pathlib as pth
+from configparser import ConfigParser
+from math import degrees as d
+from math import radians as r
+from typing import ClassVar, Dict
+
+from dataclasses import dataclass
+import matplotlib.pyplot as plt
+
+import utils as ut
+import write_file as wf
+from aeropy import xfoil_module as xf
 
 ################################
 # #Class: Airfoil

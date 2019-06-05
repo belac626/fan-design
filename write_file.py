@@ -1,19 +1,4 @@
 """Writes variables to files."""
-import csv
-import json
-import math as m
-from math import degrees as d
-from math import radians as r
-
-import os
-import pathlib as pth
-
-import matplotlib.collections as mc
-import matplotlib.pyplot as plt
-import numpy as np
-import pylab as pl
-
-import utils as ut
 
 # pylint: disable=R0902
 # - allow more than 7 instance variables
@@ -25,6 +10,24 @@ import utils as ut
 # - allow more than 50 statemnts in class or function
 # pylint: disable=C0103
 # - allow variable names less than 3 characters
+# pylint: disable=C0412
+# - allow imports to be sorted by isort and not grouped
+
+import csv
+import json
+import math as m
+import os
+import pathlib as pth
+from math import degrees as d
+from math import radians as r
+
+import matplotlib.collections as mc
+import matplotlib.pyplot as plt
+import numpy as np
+import pylab as pl
+
+import utils as ut
+
 project = os.getcwd()
 
 

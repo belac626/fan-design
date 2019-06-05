@@ -1,8 +1,4 @@
 """Airfoil calculation functions."""
-import math as m
-from math import radians as r
-
-import numpy as np
 
 # pylint: disable=R0902
 # - allow more than 7 instance variables
@@ -14,6 +10,13 @@ import numpy as np
 # - allow more than 50 statemnts in class or function
 # pylint: disable=C0103
 # - allow variable names less than 3 characters
+# pylint: disable=C0412
+# - allow imports to be sorted by isort and not grouped
+
+import math as m
+from math import radians as r
+
+import numpy as np
 
 
 def cot(rad):
