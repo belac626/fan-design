@@ -1,12 +1,11 @@
 """Determines fan flow and geometric properties."""
 import math as m
-from math import degrees as d
-from math import radians as r
-
-from typing import ClassVar
-
 import pathlib as pth
 from configparser import ConfigParser
+from math import degrees as d
+from math import radians as r
+from typing import ClassVar
+
 from dataclasses import dataclass
 
 # pylint: disable=R0902

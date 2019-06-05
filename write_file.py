@@ -2,11 +2,10 @@
 import csv
 import json
 import math as m
-from math import degrees as d
-from math import radians as r
-
 import os
 import pathlib as pth
+from math import degrees as d
+from math import radians as r
 
 import matplotlib.collections as mc
 import matplotlib.pyplot as plt
