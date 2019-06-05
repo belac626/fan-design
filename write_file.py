@@ -154,16 +154,16 @@ def write_sw_config(stage, blade, filename):
                      'xc_' + s, 'yc_' + s, 'kc_' + s, 'bc_' + s,
                      'cle_' + s, 'cte_' + s, 'rle_' + s, 'wte_' + s])
 
-    sw_v = [blade.z, stage.root.radius*2*0.0254, stage.tip.radius*2*0.0254,
-            blade.root.chord*0.0254, blade.root.stagger,
+    sw_v = [blade.z, stage.root.radius*2/0.0254, stage.tip.radius*2/0.0254,
+            blade.root.chord/0.0254, blade.root.stagger,
             blade.root.xt, blade.root.yt, blade.root.kt, blade.root.bt,
             blade.root.xc, blade.root.yc, blade.root.kc, blade.root.bc,
             blade.root.cle, blade.root.cte, blade.root.rle, blade.root.wte,
-            blade.mean.chord*0.0254, blade.mean.stagger,
+            blade.mean.chord/0.0254, blade.mean.stagger,
             blade.mean.xt, blade.mean.yt, blade.mean.kt, blade.mean.bt,
             blade.mean.xc, blade.mean.yc, blade.mean.kc, blade.mean.bc,
             blade.mean.cle, blade.mean.cte, blade.mean.rle, blade.mean.wte,
-            blade.tip.chord*0.0254, blade.tip.stagger,
+            blade.tip.chord/0.0254, blade.tip.stagger,
             blade.tip.xt, blade.tip.yt, blade.tip.kt, blade.tip.bt,
             blade.tip.xc, blade.tip.yc, blade.tip.kc, blade.tip.bc,
             blade.tip.cle, blade.tip.cte, blade.tip.rle, blade.tip.wte]

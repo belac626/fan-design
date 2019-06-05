@@ -78,10 +78,10 @@ else:
 
     POD_DICT = {
         'Pod chord': 12,
-        'Rotor chord': ROTOR.root.chord*0.0254,
-        'Stator chord': STATOR.root.chord*0.0254,
-        'ID': STAGE.root.radius*2*0.0254,
-        'OD': STAGE.tip.radius*2*0.0254,
+        'Rotor chord': ROTOR.root.chord/0.0254,
+        'Stator chord': STATOR.root.chord/0.0254,
+        'ID': STAGE.root.radius*2/0.0254,
+        'OD': STAGE.tip.radius*2/0.0254,
         'Shaft OD Nom.': 0.5,
         'Shaft OD': '"Shaft OD Nom." + 0.1',
         'Wall Thickness': 0.25,
