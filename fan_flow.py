@@ -1,15 +1,4 @@
 """Determines fan flow and geometric properties."""
-<<<<<<< HEAD
-import math as m
-import pathlib as pth
-from configparser import ConfigParser
-from math import degrees as d
-from math import radians as r
-from typing import ClassVar
-
-from dataclasses import dataclass
-=======
->>>>>>> b1d1aabfeebac9ac45a2b06c3a2bedd09093bad0
 
 # pylint: disable=R0902
 # - allow more than 7 instance variables
