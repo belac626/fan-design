@@ -16,6 +16,7 @@
 import math as m
 import pathlib as pth
 from configparser import ConfigParser
+from dataclasses import dataclass
 from math import degrees as d
 from math import radians as r
 from typing import ClassVar, Dict
@@ -25,7 +26,6 @@ import matplotlib.pyplot as plt
 import utils as ut
 import write_file as wf
 from aeropy import xfoil_module as xf
-from dataclasses import dataclass
 
 ################################
 # #Class: Airfoil
