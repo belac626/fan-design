@@ -1,4 +1,18 @@
 """Writes variables to files."""
+
+# pylint: disable=R0902
+# - allow more than 7 instance variables
+# pylint: disable=R0913
+# - allow more than 5 arguments to a function
+# pylint: disable=R0914
+# - allow more than 15 local variables
+# pylint: disable=R0915
+# - allow more than 50 statemnts in class or function
+# pylint: disable=C0103
+# - allow variable names less than 3 characters
+# pylint: disable=C0412
+# - allow imports to be sorted by isort and not grouped
+
 import csv
 import json
 import math as m
@@ -14,16 +28,6 @@ import pylab as pl
 
 import utils as ut
 
-# pylint: disable=R0902
-# - allow more than 7 instance variables
-# pylint: disable=R0913
-# - allow more than 5 arguments to a function
-# pylint: disable=R0914
-# - allow more than 15 local variables
-# pylint: disable=R0915
-# - allow more than 50 statemnts in class or function
-# pylint: disable=C0103
-# - allow variable names less than 3 characters
 project = os.getcwd()
 
 
