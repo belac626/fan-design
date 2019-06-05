@@ -4,102 +4,152 @@ from math import radians as r
 
 import numpy as np
 
+# pylint: disable=R0902
+# - allow more than 7 instance variables
+# pylint: disable=R0913
+# - allow more than 5 arguments to a function
+# pylint: disable=R0914
+# - allow more than 15 local variables
+# pylint: disable=R0915
+# - allow more than 50 statemnts in class or function
+# pylint: disable=C0103
+# - allow variable names less than 3 characters
 
-def Cot(rad):
-    """Return Cotangent of an angle in radians."""
+
+def cot(rad):
+    """Return cotangent of an angle in radians."""
     return m.cos(rad)/m.sin(rad)
 
 
-def Sec(rad):
+def sec(rad):
     """Return Secant of an angle in radians."""
     return 1/m.cos(rad)
 
 
-def GetRootFlowVars(stage, blade: str, station: str):
-    """Obtain flow variables from stage class for root blade locations."""
-    rr = stage.root
-    radius = rr.radius
+def get_vars(stage, blade: str, station: str):
+    """Obtain flow variables from stage class for blade locations."""
+    if station == 'root':
+        loc = stage.root
+
+    elif station == 'mean':
+        loc = stage.mean
+
+    elif station == 'tip':
+        loc = stage.tip
+
+    radius = loc.radius
     if blade == 'IGV':
         avle, avte, rvle, rvte, v1, v2 = (0,
-                                          rr.alpha1,
-                                          rr.beta2,
-                                          rr.beta1,
-                                          rr.cx,
-                                          rr.c1)
+                                          loc.alpha1,
+                                          loc.beta2,
+                                          loc.beta1,
+                                          loc.cx,
+                                          loc.c1)
+
     elif blade == 'Rotor':
-        avle, avte, rvle, rvte, v1, v2 = (rr.beta1,
-                                          rr.beta2,
-                                          rr.alpha1,
-                                          rr.alpha2,
-                                          rr.w1,
-                                          rr.w2)
+        avle, avte, rvle, rvte, v1, v2 = (loc.beta1,
+                                          loc.beta2,
+                                          loc.alpha1,
+                                          loc.alpha2,
+                                          loc.w1,
+                                          loc.w2)
+
     elif blade == 'OSV' or 'Stator':
-        avle, avte, rvle, rvte, v1, v2 = (rr.alpha2,
-                                          rr.alpha1,
-                                          rr.beta2,
-                                          rr.beta1,
-                                          rr.c2,
-                                          rr.c1)
+        avle, avte, rvle, rvte, v1, v2 = (loc.alpha2,
+                                          loc.alpha1,
+                                          loc.beta2,
+                                          loc.beta1,
+                                          loc.c2,
+                                          loc.c1)
+
     return avle, avte, rvle, rvte, v1, v2, radius
 
 
-def GetMeanFlowVars(stage, blade: str, station: str):
-    """Obtain flow variables from stage class for mean blade locations."""
-    mm = stage.mean
-    radius = mm.radius
-    if blade == 'IGV':
-        avle, avte, rvle, rvte, v1, v2 = (0,
-                                          mm.alpha1,
-                                          mm.beta2,
-                                          mm.beta1,
-                                          mm.cx,
-                                          mm.c1)
-    elif blade == 'Rotor':
-        avle, avte, rvle, rvte, v1, v2 = (mm.beta1,
-                                          mm.beta2,
-                                          mm.alpha1,
-                                          mm.alpha2,
-                                          mm.w1,
-                                          mm.w2)
-    elif blade == 'OSV' or 'Stator':
-        avle, avte, rvle, rvte, v1, v2 = (mm.alpha2,
-                                          mm.alpha1,
-                                          mm.beta2,
-                                          mm.beta1,
-                                          mm.c2,
-                                          mm.c1)
-    return avle, avte, rvle, rvte, v1, v2, radius
+# def get_root_flow_vars(stage, blade: str, station: str):
+#     """Obtain flow variables from stage class for root blade locations."""
+#     rr = stage.root
+#     radius = rr.radius
+#     if blade == 'IGV':
+#         avle, avte, rvle, rvte, v1, v2 = (0,
+#                                           rr.alpha1,
+#                                           rr.beta2,
+#                                           rr.beta1,
+#                                           rr.cx,
+#                                           rr.c1)
+#     elif blade == 'Rotor':
+#         avle, avte, rvle, rvte, v1, v2 = (rr.beta1,
+#                                           rr.beta2,
+#                                           rr.alpha1,
+#                                           rr.alpha2,
+#                                           rr.w1,
+#                                           rr.w2)
+#     elif blade == 'OSV' or 'Stator':
+#         avle, avte, rvle, rvte, v1, v2 = (rr.alpha2,
+#                                           rr.alpha1,
+#                                           rr.beta2,
+#                                           rr.beta1,
+#                                           rr.c2,
+#                                           rr.c1)
+#     return avle, avte, rvle, rvte, v1, v2, radius
+#
+#
+# def get_mean_flow_vars(stage, blade: str, station: str):
+#     """Obtain flow variables from stage class for mean blade locations."""
+#     mm = stage.mean
+#     radius = mm.radius
+#     if blade == 'IGV':
+#         avle, avte, rvle, rvte, v1, v2 = (0,
+#                                           mm.alpha1,
+#                                           mm.beta2,
+#                                           mm.beta1,
+#                                           mm.cx,
+#                                           mm.c1)
+#     elif blade == 'Rotor':
+#         avle, avte, rvle, rvte, v1, v2 = (mm.beta1,
+#                                           mm.beta2,
+#                                           mm.alpha1,
+#                                           mm.alpha2,
+#                                           mm.w1,
+#                                           mm.w2)
+#     elif blade == 'OSV' or 'Stator':
+#         avle, avte, rvle, rvte, v1, v2 = (mm.alpha2,
+#                                           mm.alpha1,
+#                                           mm.beta2,
+#                                           mm.beta1,
+#                                           mm.c2,
+#                                           mm.c1)
+#     return avle, avte, rvle, rvte, v1, v2, radius
+#
+#
+# def get_tip_flow_vars(stage, blade: str, station: str):
+#     """Obtain flow variables from stage class for tip blade locations."""
+#     tt = stage.tip
+#     radius = tt.radius
+#     if blade == 'IGV':
+#         avle, avte, rvle, rvte, v1, v2 = (0,
+#                                           tt.alpha1,
+#                                           tt.beta2,
+#                                           tt.beta1,
+#                                           tt.cx,
+#                                           tt.c1)
+#     elif blade == 'Rotor':
+#         avle, avte, rvle, rvte, v1, v2 = (tt.beta1,
+#                                           tt.beta2,
+#                                           tt.alpha1,
+#                                           tt.alpha2,
+#                                           tt.w1,
+#                                           tt.w2)
+#     elif blade == 'OSV' or 'Stator':
+#         avle, avte, rvle, rvte, v1, v2 = (tt.alpha2,
+#                                           tt.alpha1,
+#                                           tt.beta2,
+#                                           tt.beta1,
+#                                           tt.c2,
+#                                           tt.c1)
+#     return avle, avte, rvle, rvte, v1, v2, radius
 
 
-def GetTipFlowVars(stage, blade: str, station: str):
-    """Obtain flow variables from stage class for tip blade locations."""
-    tt = stage.tip
-    radius = tt.radius
-    if blade == 'IGV':
-        avle, avte, rvle, rvte, v1, v2 = (0,
-                                          tt.alpha1,
-                                          tt.beta2,
-                                          tt.beta1,
-                                          tt.cx,
-                                          tt.c1)
-    elif blade == 'Rotor':
-        avle, avte, rvle, rvte, v1, v2 = (tt.beta1,
-                                          tt.beta2,
-                                          tt.alpha1,
-                                          tt.alpha2,
-                                          tt.w1,
-                                          tt.w2)
-    elif blade == 'OSV' or 'Stator':
-        avle, avte, rvle, rvte, v1, v2 = (tt.alpha2,
-                                          tt.alpha1,
-                                          tt.beta2,
-                                          tt.beta1,
-                                          tt.c2,
-                                          tt.c1)
-    return avle, avte, rvle, rvte, v1, v2, radius
-
-
-def Chord(radius, hub, z, aoa):
+def calcchord(radius, hub, z, aoa):
     """Calculate max chord.
 
     Chord is to be definied such that either:
@@ -115,7 +165,7 @@ def Chord(radius, hub, z, aoa):
     return chord
 
 
-def Incidence(thickness, solidity, relative_inlet_angle):
+def calcincidence(thickness, solidity, relative_inlet_angle):
     """Calculate incidence of flow over airfoil."""
     k_sh = 1.0
     k_ti = (-0.0214
@@ -132,7 +182,7 @@ def Incidence(thickness, solidity, relative_inlet_angle):
     return incidence, n_slope
 
 
-def Deviation(thickness, solidity, relative_inlet_angle):
+def calcdeviation(thickness, solidity, relative_inlet_angle):
     """Calculate deviation of flow over airfoil."""
     k_sh = 1.0
     k_td = (0.0142
@@ -159,14 +209,14 @@ def Deviation(thickness, solidity, relative_inlet_angle):
     #     self.deviation = m_dev*self.camber*(1/self.sigma)
 
 
-def CamberCurvature(xc, yc):
+def cambercurvature(xc, yc):
     """Calculate camber curvature based on modified NACA 4."""
     kc = -yc*(1/(xc**2) + 1/((1 - xc)**2))
 
     return kc
 
 
-def ThicknessCurvature(xt, yt):
+def thicknesscurvature(xt, yt):
     """Calculate thickness curvature based on modified NACA 4."""
     d1 = (2.24 - 5.42*xt + 12.3*xt**2)/(10*(1 - 0.878*xt))
     d2 = (0.294 - 2*(1 - xt)*d1)/((1 - xt)**2)
@@ -185,7 +235,7 @@ def ThicknessCurvature(xt, yt):
     return kt
 
 
-def Curvatures(xc, yc, xt, yt):
+def curvatures(xc, yc, xt, yt):
     """Calculate camber and thickness curvatures based on modified NACA 4."""
     d1 = (2.24 - 5.42*xt + 12.3*xt**2)/(10*(1 - 0.878*xt))
     d2 = (0.294 - 2*(1 - xt)*d1)/((1 - xt)**2)
@@ -205,10 +255,10 @@ def Curvatures(xc, yc, xt, yt):
     return kc, kt
 
 
-def CamberBezier(xc, yc, kc, cle, cte, rle):
+def camberbezier(xc, yc, kc, cle, cte):
     """Calculate camber bezier variable in BP3333 airfoil."""
     bc = 0
-    co = Cot(r(cle)) + Cot(r(cte))
+    co = cot(r(cle)) + cot(r(cte))
     bcu = (16 + 3*kc*co + 4*m.sqrt(16 + 6*kc*co*(1 - yc*co)))/(3*kc*co**2)
     bcl = (16 + 3*kc*co - 4*m.sqrt(16 + 6*kc*co*(1 - yc*co)))/(3*kc*co**2)
 
@@ -217,7 +267,7 @@ def CamberBezier(xc, yc, kc, cle, cte, rle):
 
     for bci in cbounds:
         bci_list.append(round(bci, 4))
-        if bci > 0 and bci < yc:
+        if 0 < bci < yc:
             bc = float(bci)
             xlc2 = xc - m.sqrt((2/3)*(bci - yc)/(kc))
 
@@ -238,17 +288,17 @@ def CamberBezier(xc, yc, kc, cle, cte, rle):
         raise ValueError(f'No bc found within bounds 0 < bc < {yc: .4f}.')
 
 
-def ThicknessBezier(xt, yt, kt, rle, blade: str, station: str):
+def thicknessbezier(xt, yt, kt, rle, blade: str, station: str):
     """Calculate thickness bezier variable in BP3333 airfoil."""
     bt = 0
-    poly = ((27 / 4) * kt**2,
-            -27 * kt**2 * xt,
-            9 * kt * yt + (81 / 2) * kt**2 * xt**2,
-            2 * -rle - 18 * kt * xt * yt - 27 * kt**2 * xt**3,
-            3 * yt**2 + 9 * kt * xt**2 * yt + (27 / 4) * kt**2 * xt**4)
+    b_poly = ((27 / 4) * kt**2,
+              -27 * kt**2 * xt,
+              9 * kt * yt + (81 / 2) * kt**2 * xt**2,
+              2 * -rle - 18 * kt * xt * yt - 27 * kt**2 * xt**3,
+              3 * yt**2 + 9 * kt * xt**2 * yt + (27 / 4) * kt**2 * xt**4)
 
-    real_troots = [root.real for root in np.roots(poly) if root.imag == 0]
-    min = max(0, xt - m.sqrt((-2/3)*(yt/kt)))
+    real_troots = [root.real for root in np.roots(b_poly) if root.imag == 0]
+    low_b = max(0, xt - m.sqrt((-2/3)*(yt/kt)))
     bti_list = []
 
     for bti in real_troots:
@@ -260,7 +310,7 @@ def ThicknessBezier(xt, yt, kt, rle, blade: str, station: str):
             raise ValueError('Invalid Airfoil Shape.'
                              f'{blade} {station} bt is complex.')
 
-        if bti > max(0, xt - m.sqrt((-2/3)*(yt/kt))) and bti < xt:
+        if low_b < bti < xt:
             bt = float(bti)
             ylt1 = yt + (3/2)*kt*(xt - bti)**2
 
@@ -278,16 +328,17 @@ def ThicknessBezier(xt, yt, kt, rle, blade: str, station: str):
         print(f'yt = {yt}')
         print(f'kt = {kt:.4f}')
         print(f'bt = {bti_list}')
-        raise ValueError(f'No bt found within bounds {min:.4f} < bt < {xt}.')
+        raise ValueError(f'No bt found within bounds {low_b:.4f} < bt < {xt}.')
+
+    return bt
 
 
-def Beziers(xc, yc, kc, xt, yt, kt, cle, cte, rle,  # noqa R701
-            blade: str, station: str):
+def beziers(xc, yc, kc, xt, yt, kt, cle, cte, rle, blade: str, station: str):
     """Calculate camber and thickness Bezier variables in BP3333 airfoil."""
     bc = 0
     bt = 0
 
-    co = Cot(r(cle)) + Cot(r(cte))
+    co = cot(r(cle)) + cot(r(cte))
     bcu = (16 + 3*kc*co + 4*m.sqrt(16 + 6*kc*co*(1 - yc*co)))/(3*kc*co**2)
     bcl = (16 + 3*kc*co - 4*m.sqrt(16 + 6*kc*co*(1 - yc*co)))/(3*kc*co**2)
 
@@ -296,7 +347,7 @@ def Beziers(xc, yc, kc, xt, yt, kt, cle, cte, rle,  # noqa R701
 
     for bci in cbounds:
         bci_list.append(round(bci, 4))
-        if bci > 0 and bci < yc:
+        if 0 < bci < yc:
             bc = float(bci)
             xlc2 = xc - m.sqrt((2/3)*(bci - yc)/(kc))
 
@@ -316,14 +367,14 @@ def Beziers(xc, yc, kc, xt, yt, kt, cle, cte, rle,  # noqa R701
         print(f'bc = {bci_list}')
         raise ValueError(f'No bc found within bounds 0 < bc < {yc: .4f}.')
 
-    poly = ((27 / 4) * kt**2,
-            -27 * kt**2 * xt,
-            9 * kt * yt + (81 / 2) * kt**2 * xt**2,
-            2 * -rle - 18 * kt * xt * yt - 27 * kt**2 * xt**3,
-            3 * yt**2 + 9 * kt * xt**2 * yt + (27 / 4) * kt**2 * xt**4)
+    b_poly = ((27 / 4) * kt**2,
+              -27 * kt**2 * xt,
+              9 * kt * yt + (81 / 2) * kt**2 * xt**2,
+              2 * -rle - 18 * kt * xt * yt - 27 * kt**2 * xt**3,
+              3 * yt**2 + 9 * kt * xt**2 * yt + (27 / 4) * kt**2 * xt**4)
 
-    real_troots = [root.real for root in np.roots(poly) if root.imag == 0]
-    min = max(0, xt - m.sqrt((-2/3)*(yt/kt)))
+    real_troots = [root.real for root in np.roots(b_poly) if root.imag == 0]
+    low_b = max(0, xt - m.sqrt((-2/3)*(yt/kt)))
     bti_list = []
 
     for bti in real_troots:
@@ -335,7 +386,7 @@ def Beziers(xc, yc, kc, xt, yt, kt, cle, cte, rle,  # noqa R701
             raise ValueError('Invalid Airfoil Shape.'
                              f'{blade} {station} bt is complex.')
 
-        if bti > max(0, xt - m.sqrt((-2/3)*(yt/kt))) and bti < xt:
+        if low_b < bti < xt:
             bt = float(bti)
             ylt1 = yt + (3/2)*kt*(xt - bti)**2
 
@@ -353,6 +404,6 @@ def Beziers(xc, yc, kc, xt, yt, kt, cle, cte, rle,  # noqa R701
         print(f'yt = {yt}')
         print(f'kt = {kt:.4f}')
         print(f'bt = {bti_list}')
-        raise ValueError(f'No bt found within bounds {min:.4f} < bt < {xt}.')
+        raise ValueError(f'No bt found within bounds {low_b:.4f} < bt < {xt}.')
 
     return bc, bt

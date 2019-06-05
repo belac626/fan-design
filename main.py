@@ -1,128 +1,127 @@
 """Used to implement variables in Solidworks Leaf Shredder."""
 import os
-import pathlib as p
-import utils as u
+import pathlib as pth
+
+import utils as ut
 import write_file as wf
 
-compressor = False
+COMPRESSOR = False
 
-if compressor:
+if COMPRESSOR:
     from comp_thermoflow import Stage
     from comp_geo import Blade
 else:
     from fan_flow import Stage
     from fan_geo import Blade
 
-cwd = os.getcwd()
-if compressor:
-    stage = Stage()
-    stage.GetStageConfig(filename='Comp_Stage.ini')
-    stage.CalcStage()
+CWD = os.getcwd()
+if COMPRESSOR:
+    STAGE = Stage()
+    STAGE.get_stage_config(filename='Comp_Stage.ini')
+    STAGE.calcstage()
 
-    igv = Blade()
-    igv.GetBladeConfig(filename='Comp_IGV.ini')
-    igv.CalcBlade(stage=stage, blade='IGV')
-    rotor = Blade()
-    rotor.GetBladeConfig(filename='Comp_Rotor.ini')
-    rotor.CalcBlade(stage=stage, blade='Rotor')
-    stator = Blade()
-    stator.GetBladeConfig(filename='Comp_Stator.ini')
-    stator.CalcBlade(stage=stage, blade='Stator')
+    IGV = Blade()
+    IGV.get_blade_config(filename='Comp_IGV.ini')
+    IGV.calcblade(stage=STAGE, blade='IGV')
+    ROTOR = Blade()
+    ROTOR.get_blade_config(filename='Comp_Rotor.ini')
+    ROTOR.calcblade(stage=STAGE, blade='Rotor')
+    STATOR = Blade()
+    STATOR.get_blade_config(filename='Comp_Stator.ini')
+    STATOR.calcblade(stage=STAGE, blade='Stator')
 
-    pod_dict = {
+    POD_DICT = {
         'Pod chord': 12,
-        'Rotor chord': rotor.root.chord,
-        'Stator chord': stator.root.chord,
-        'ID': stage.root.radius*2,
-        'OD': stage.tip.radius*2,
+        'Rotor chord': ROTOR.root.chord,
+        'Stator chord': STATOR.root.chord,
+        'ID': STAGE.root.radius*2,
+        'OD': STAGE.tip.radius*2,
         'Shaft OD Nom.': 0.5,
         'Shaft OD': '"Shaft OD Nom." + 0.1',
         'Wall Thickness': 0.25,
         'Pre Blades': 3,
         'Blades': 3,
         'Tip Clearance': 0.05,
-        'Chord': igv.mean.chord,
-        'xt': igv.mean.xt,
-        'yt': igv.mean.yt,
-        'kt': igv.mean.kt,
-        'xc': igv.mean.xc,
-        'yc': igv.mean.yc,
-        'kc': igv.mean.kc,
-        'rle': igv.mean.rle,
-        'cle': abs(igv.mean.cle),
-        'cte': abs(igv.mean.cte),
-        'wte': igv.mean.wte,
-        'bt': igv.mean.bt,
-        'bc': igv.mean.bc,
-        'Stagger': igv.mean.stagger
+        'Chord': IGV.mean.chord,
+        'xt': IGV.mean.xt,
+        'yt': IGV.mean.yt,
+        'kt': IGV.mean.kt,
+        'xc': IGV.mean.xc,
+        'yc': IGV.mean.yc,
+        'kc': IGV.mean.kc,
+        'rle': IGV.mean.rle,
+        'cle': abs(IGV.mean.cle),
+        'cte': abs(IGV.mean.cte),
+        'wte': IGV.mean.wte,
+        'bt': IGV.mean.bt,
+        'bc': IGV.mean.bc,
+        'Stagger': IGV.mean.stagger
     }
 else:
-    stage = Stage()
-    stage.GetStageConfig(filename='Fan_Stage.ini')
-    stage.CalcStage()
+    STAGE = Stage()
+    STAGE.get_stage_config(filename='Fan_Stage.ini')
+    STAGE.calcstage()
 
-    igv = Blade()
-    igv.GetBladeConfig(filename='Fan_IGV.ini')
-    igv.mean.rle = 1.1019*(2*igv.mean.yt)**2
-    igv.mean.kt = u.ThicknessCurvature(igv.mean.xt, igv.mean.yt)
-    igv.mean.bt = u.ThicknessBezier(igv.mean.xt, igv.mean.yt,
-                                    igv.mean.kt, igv.mean.rle,
-                                    blade='IGV', station='mean')
-    rotor = Blade()
-    rotor.GetBladeConfig(filename='Fan_Rotor.ini')
-    rotor.CalcBlade(stage=stage, blade='Rotor')
-    stator = Blade()
-    stator.GetBladeConfig(filename='Fan_OSV.ini')
-    stator.CalcBlade(stage=stage, blade='OSV')
+    IGV = Blade()
+    IGV.get_blade_config(filename='Fan_IGV.ini')
+    IGV.mean.rle = 1.1019*(2*IGV.mean.yt)**2
+    IGV.mean.kt = ut.thicknesscurvature(IGV.mean.xt, IGV.mean.yt)
+    IGV.mean.bt = ut.thicknessbezier(IGV.mean.xt, IGV.mean.yt,
+                                     IGV.mean.kt, IGV.mean.rle,
+                                     blade='IGV', station='mean')
+    ROTOR = Blade()
+    ROTOR.get_blade_config(filename='Fan_Rotor.ini')
+    ROTOR.calcblade(stage=STAGE, blade='Rotor')
+    STATOR = Blade()
+    STATOR.get_blade_config(filename='Fan_OSV.ini')
+    STATOR.calcblade(stage=STAGE, blade='OSV')
 
-    pod_dict = {
+    POD_DICT = {
         'Pod chord': 12,
-        'Rotor chord': rotor.root.chord*0.0254,
-        'Stator chord': stator.root.chord*0.0254,
-        'ID': stage.root.radius*2*0.0254,
-        'OD': stage.tip.radius*2*0.0254,
+        'Rotor chord': ROTOR.root.chord*0.0254,
+        'Stator chord': STATOR.root.chord*0.0254,
+        'ID': STAGE.root.radius*2*0.0254,
+        'OD': STAGE.tip.radius*2*0.0254,
         'Shaft OD Nom.': 0.5,
         'Shaft OD': '"Shaft OD Nom." + 0.1',
         'Wall Thickness': 0.25,
         'Pre Blades': 3,
         'Blades': 3,
         'Tip Clearance': 0.05,
-        # 'Chord': igv.mean.chord,
-        'xt': igv.mean.xt,
-        'yt': igv.mean.yt,
-        'kt': igv.mean.kt,
-        # 'xc': igv.mean.xc,
-        # 'yc': igv.mean.yc,
-        # 'kc': igv.mean.kc,
-        'rle': igv.mean.rle,
-        # 'cle': abs(igv.mean.cle),
-        # 'cte': abs(igv.mean.cte),
+        # 'Chord': IGV.mean.chord,
+        'xt': IGV.mean.xt,
+        'yt': IGV.mean.yt,
+        'kt': IGV.mean.kt,
+        # 'xc': IGV.mean.xc,
+        # 'yc': IGV.mean.yc,
+        # 'kc': IGV.mean.kc,
+        'rle': IGV.mean.rle,
+        # 'cle': abs(IGV.mean.cle),
+        # 'cte': abs(IGV.mean.cte),
         # 'wte': igb.mean.wte,
-        'bt': igv.mean.bt,
-        # 'bc': igv.mean.bc,
-        # 'Stagger': igv.mean.stagger
+        'bt': IGV.mean.bt,
+        # 'bc': IGV.mean.bc,
+        # 'Stagger': IGV.mean.stagger
     }
 
 os.chdir('..')
-pod_file = p.Path('Solidworks/Vars/Pod.txt')
-with open(pod_file, 'w') as pod:
-    output = []
-    for key, value in pod_dict.items():
+POD_FILE = pth.Path('Solidworks/Vars/Pod.txt')
+with open(POD_FILE, 'w') as pod:
+    OUTPUT = []
+    for key, value in POD_DICT.items():
         line = f'"{key}"= {value}'
-        output.append(line)
-    output = '\n'.join(output)
-    pod.write(output)
-os.chdir(cwd)
+        OUTPUT.append(line)
+    OUTPUT = '\n'.join(OUTPUT)
+    pod.write(OUTPUT)
+os.chdir(CWD)
 
-rotor_file = wf.Solidworks()
-rotor_file.WriteConfig(stage=stage, blade=rotor, filename='Rotor.txt')
+wf.write_sw_config(stage=STAGE, blade=ROTOR, filename='Rotor.txt')
 
-stator_file = wf.Solidworks()
-stator_file.WriteConfig(stage=stage, blade=stator, filename='Stator.txt')
+wf.write_sw_config(stage=STAGE, blade=STATOR, filename='Stator.txt')
 
-wf.DumpVars.Dump_Blade_Csv(filename='Blade_dump.csv',
-                           rotor=rotor, stator=stator)
-wf.DumpVars.Dump_Stage_Csv(filename='Stage_dump.csv',
-                           stage=stage)
-wf.DumpVars.Dump_Json(filename='Vars_dump.json',
-                      stage=stage, igv=igv, rotor=rotor, stator=stator)
+wf.DumpVars.dump_blade_csv(filename='Blade_dump.csv',
+                           rotor=ROTOR, stator=STATOR)
+wf.DumpVars.dump_stage_csv(filename='Stage_dump.csv',
+                           stage=STAGE)
+wf.DumpVars.dump_json(filename='Vars_dump.json',
+                      stage=STAGE, igv=IGV, rotor=ROTOR, stator=STATOR)

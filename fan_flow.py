@@ -1,14 +1,28 @@
 """Determines fan flow and geometric properties."""
 import math as m
-import pathlib as pth
-from configparser import ConfigParser
 from math import degrees as d
 from math import radians as r
+
+from typing import ClassVar
+
+import pathlib as pth
+from configparser import ConfigParser
+from dataclasses import dataclass
+
+# pylint: disable=R0902
+# - allow more than 7 instance variables
+# pylint: disable=R0913
+# - allow more than 5 arguments to a function
+# pylint: disable=R0914
+# - allow more than 15 local variables
+# pylint: disable=R0915
+# - allow more than 50 statemnts in class or function
+# pylint: disable=C0103
+# - allow variable names less than 3 characters
 
 ################################
 # #Class: ThermoFlow
 # Holds stage flow characteristics
-
 
 # ---Flow Attributes:
 # r: reaction coefficient
@@ -38,54 +52,55 @@ from math import radians as r
 # T1: inlet static temperature (K)
 # P1: inlet static pressure (bar)
 ################################
-class FanFlow():
+
+
+@dataclass
+class FanFlow:
     """Set flow properties."""
 
-    def __init__(self):
-        """Instantiate flow properties."""
-        self.reaction = 0
-        self.phi = 0
-        self.psi = 0
-        self.rpm = 0
-        self.radius = 0
-        self.span = 0
+    reaction: float = 0
+    phi: float = 0
+    psi: float = 0
+    rpm: float = 0
+    radius: float = 0
+    span: float = 0
 
-        self.u = 0
-        self.beta1 = 0
-        self.beta2 = 0
-        self.betam = 0
-        self.alpha1 = 0
-        self.alpha2 = 0
-        self.alpham = 0
-        self.cx = 0
-        self.w1 = 0
-        self.w2 = 0
-        self.c1 = 0
-        self.c2 = 0
-        self.wt1 = 0
-        self.wt2 = 0
-        self.ct1 = 0
-        self.ct2 = 0
+    u: float = 0
+    beta1: float = 0
+    beta2: float = 0
+    betam: float = 0
+    alpha1: float = 0
+    alpha2: float = 0
+    alpham: float = 0
+    cx: float = 0
+    w1: float = 0
+    w2: float = 0
+    c1: float = 0
+    c2: float = 0
+    wt1: float = 0
+    wt2: float = 0
+    ct1: float = 0
+    ct2: float = 0
 
-    def GetFanFlowConfig(self, filename:str, station:str):
+    def get_fan_flow_config(self, filename: str, station: str):
         """Read .ini file."""
-        cfp = ConfigParser()
-        file = pth.Path(f'Config/{filename}')
-        cfp.read(file)  # Fan_Stage.ini
+        file = pth.Path(f'{pth.Path.cwd()}/Config/{filename}')
+        config = ConfigParser()
+        config.read(file)  # Fan_Stage.ini
 
-        self.reaction = cfp.getfloat('flow', 'r')
-        self.phi = cfp.getfloat('flow', 'phi')
-        self.rpm = cfp.getfloat('flow', 'rpm')
-        self.alpha1 = cfp.getfloat('flow', 'alpha1')
-        self.span = (cfp.getfloat('tip', 'radius')
-                     - cfp.getfloat('root', 'radius'))
+        self.reaction = config.getfloat('flow', 'r')
+        self.phi = config.getfloat('flow', 'phi')
+        self.rpm = config.getfloat('flow', 'rpm')
+        self.alpha1 = config.getfloat('flow', 'alpha1')
+        self.span = (config.getfloat('tip', 'radius')
+                     - config.getfloat('root', 'radius'))
         if station == 'mean':
-            self.radius = m.sqrt((cfp.getfloat('root', 'radius')**2
-                                  + cfp.getfloat('tip', 'radius')**2)/2)
+            self.radius = m.sqrt((config.getfloat('root', 'radius')**2
+                                  + config.getfloat('tip', 'radius')**2)/2)
         else:
-            self.radius = cfp.getfloat(station, 'radius')
+            self.radius = config.getfloat(station, 'radius')
 
-    def CalcFanFlow(self, iphi=None):
+    def calc_fan_flow(self, iphi=None):
         """Calculate flow angles."""
         if iphi is not None:
             self.phi = iphi
@@ -109,7 +124,6 @@ class FanFlow():
         self.ct1 = self.c1*m.sin(r(self.alpha1))
         self.ct2 = self.c2*m.sin(r(self.alpha2))
 
-
 ################################
 # #Class: Stage
 # Holds stage characteristics
@@ -121,56 +135,57 @@ class FanFlow():
 # rpm: angular velocity of rotor (float) (rpm)
 # span: blade height (float) (m)
 ################################
-class Stage():
+
+
+@dataclass
+class Stage:
     """Set stage properties."""
 
-    def __init__(self):
-        """Instantiate stage properties."""
-        self.root = FanFlow()
-        self.mean = FanFlow()
-        self.tip = FanFlow()
+    root: ClassVar = FanFlow()
+    mean: ClassVar = FanFlow()
+    tip: ClassVar = FanFlow()
 
-        self.rpm = 0
-        self.span = 0
+    rpm: float = 0
+    span: float = 0
 
-    def GetStageConfig(self, filename: str):
+    def get_stage_config(self, filename: str):
         """Read .inp files."""
-        self.root.GetFanFlowConfig(filename=filename, station='root')
-        self.mean.GetFanFlowConfig(filename=filename, station='mean')
-        self.tip.GetFanFlowConfig(filename=filename, station='tip')
+        self.root.get_fan_flow_config(filename=filename, station='root')
+        self.mean.get_fan_flow_config(filename=filename, station='mean')
+        self.tip.get_fan_flow_config(filename=filename, station='tip')
 
-        cfp = ConfigParser()
         file = pth.Path(f'Config/{filename}')
-        cfp.read(file)
+        config = ConfigParser()
+        config.read(file)
 
-        self.rpm = cfp.getfloat('flow', 'rpm')
-        self.span = (cfp.getfloat('tip', 'radius')
-                     - cfp.getfloat('root', 'radius'))
+        self.rpm = config.getfloat('flow', 'rpm')
+        self.span = (config.getfloat('tip', 'radius')
+                     - config.getfloat('root', 'radius'))
 
-    def CalcStage(self):
+    def calcstage(self):
         """Calculate stage properties (assumes cosntant dcx/dr)."""
-        self.mean.CalcFanFlow()
+        self.mean.calc_fan_flow()
 
-        self.root.CalcFanFlow()
+        self.root.calc_fan_flow()
         lphi = 1e-6
         hphi = 2 - 1e-6
-        rootPhi = self.root.phi
-        while (abs(self.mean.cx - self.root.cx) > 1e-3):
-            if (self.root.cx < self.mean.cx):
-                lphi = rootPhi
+        root_phi = self.root.phi
+        while abs(self.mean.cx - self.root.cx) > 1e-3:
+            if self.root.cx < self.mean.cx:
+                lphi = root_phi
             else:
-                hphi = rootPhi
-            rootPhi = (hphi + lphi)/2
-            self.root.CalcFanFlow(iphi=rootPhi)
+                hphi = root_phi
+            root_phi = (hphi + lphi)/2
+            self.root.calc_fan_flow(iphi=root_phi)
 
-        self.tip.CalcFanFlow()
+        self.tip.calc_fan_flow()
         lphi = 1e-6
         hphi = 2 - 1e-6
-        tipPhi = self.tip.phi
-        while (abs(self.mean.cx - self.tip.cx) > 1e-3):
-            if (self.tip.cx < self.mean.cx):
-                lphi = tipPhi
+        tip_phi = self.tip.phi
+        while abs(self.mean.cx - self.tip.cx) > 1e-3:
+            if self.tip.cx < self.mean.cx:
+                lphi = tip_phi
             else:
-                hphi = tipPhi
-            tipPhi = (hphi + lphi)/2
-            self.tip.CalcFanFlow(iphi=tipPhi)
+                hphi = tip_phi
+            tip_phi = (hphi + lphi)/2
+            self.tip.calc_fan_flow(iphi=tip_phi)

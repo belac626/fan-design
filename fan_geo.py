@@ -1,15 +1,28 @@
 """Determines compressor blade geometry."""
 import math as m
-import pathlib as pth
-from configparser import ConfigParser
 from math import degrees as d
 from math import radians as r
+import pathlib as pth
+from configparser import ConfigParser
+from dataclasses import dataclass
+from typing import ClassVar, Dict
 
 import matplotlib.pyplot as plt
 
-import utils as u
+import utils as ut
 import write_file as wf
 from aeropy import xfoil_module as xf
+
+# pylint: disable=R0902
+# - allow more than 7 instance variables
+# pylint: disable=R0913
+# - allow more than 5 arguments to a function
+# pylint: disable=R0914
+# - allow more than 15 local variables
+# pylint: disable=R0915
+# - allow more than 50 statemnts in class or function
+# pylint: disable=C0103
+# - allow variable names less than 3 characters
 
 ################################
 # #Class: Airfoil
@@ -66,94 +79,86 @@ from aeropy import xfoil_module as xf
 ################################
 
 
-class Airfoil():
+@dataclass
+class Airfoil:
     """Set Bezier-PARSEC variables."""
 
-    def __init__(self):
-        """Instantiate airfoil properties."""
-        self.z = 0
-        self.hub = 0
-        self.ar = 0
-        self.df = 0
-        self.dh = 0
+    polar: Dict = 0
+    cp: Dict = 0
+    sv: Dict = 0
 
-        self.sigma = 0
-        self.space = 0
-        self.chord = 0
-        self.deflection = 0
-        self.incidence = 0
-        self.deviation = 0
-        self.blade_angle_i = 0
-        self.blade_angle_e = 0
-        self.camber = 0
-        self.blade_angle_e2 = 0
-        self.camber2 = 0
-        self.stagger = 0
-        self.aoa = 0
+    z: float = 0
+    hub: float = 0
+    ar: float = 0
+    df: float = 0
+    dh: float = 0
 
-        self.xcr = 0
-        self.ycr = 0
-        self.xc = 0
-        self.yc = 0
-        self.kc = 0
-        self.bc = 0
-        self.xt = 0
-        self.yt = 0
-        self.kt = 0
-        self.bt = 0
-        self.cle = 0
-        self.cte = 0
-        self.rle = 0
-        self.wte = 0
+    sigma: float = 0
+    space: float = 0
+    chord: float = 0
+    deflection: float = 0
+    incidence: float = 0
+    deviation: float = 0
+    blade_angle_i: float = 0
+    blade_angle_e: float = 0
+    camber: float = 0
+    blade_angle_e2: float = 0
+    camber2: float = 0
+    stagger: float = 0
+    aoa: float = 0
 
-        self.rho = 1.2
-        self.mu = 0.00018
-        self.Re = 0
-        self._psi = 0
-        self.psi_opt = 0
-        self.polar = {}
+    xcr: float = 0
+    ycr: float = 0
+    xc: float = 0
+    yc: float = 0
+    kc: float = 0
+    bc: float = 0
+    xt: float = 0
+    yt: float = 0
+    kt: float = 0
+    bt: float = 0
+    cle: float = 0
+    cte: float = 0
+    rle: float = 0
+    wte: float = 0
 
-        self.dX = 0
-        self.dTau = 0
-        self.delta_p = 0
-        self.delta_T = 0
-        self.efficiency = 0
+    rho: float = 1.2
+    mu: float = 0.00018
+    Re: float = 0
+    _psi: float = 0
+    psi_opt: float = 0
 
-    def GetAirfoilConfig(self, filename: str, station: str):
+    dX: float = 0
+    dTau: float = 0
+    delta_p: float = 0
+    delta_T: float = 0
+    efficiency: float = 0
+
+    def get_airfoil_config(self, filename: str, station: str):
         """Read .ini file."""
-        cfp = ConfigParser()
         file = pth.Path(f'Config/{filename}')
-        cfp.read(file)
+        config = ConfigParser()
+        config.read(file)
 
-        self.z = cfp.getfloat('blade', 'z')
-        self.hub = cfp.getfloat('blade', 'hub')
-        self.ar = cfp.getfloat('blade', 'ar')
+        self.z = config.getfloat('blade', 'z')
+        self.hub = config.getfloat('blade', 'hub')
+        self.ar = config.getfloat('blade', 'ar')
 
-        self.df = cfp.getfloat(station, 'DF')
-        self.xcr = cfp.getfloat(station, 'xcr')
-        self.ycr = cfp.getfloat(station, 'ycr')
-        self.xt = cfp.getfloat(station, 'xt')
-        self.yt = cfp.getfloat(station, 'yt')
+        self.df = config.getfloat(station, 'DF')
+        self.xcr = config.getfloat(station, 'xcr')
+        self.ycr = config.getfloat(station, 'ycr')
+        self.xt = config.getfloat(station, 'xt')
+        self.yt = config.getfloat(station, 'yt')
 
-    def CalcAirfoil(self, stage, blade: str, station: str,
-                    plotAirfoil=False, plotPolar=False,
-                    plotCp=False, plotSv=False):
+    def calcairfoil(self, stage, blade: str, station: str,
+                    plot_airfoil=False, plot_ploar=False,
+                    plot_cp=False, plot_sv=False):
         """Calculate Bezier-PARSEC variables and airfoil properties."""
-        if station == 'root':
-            FlowVars = u.GetRootFlowVars(stage=stage,
-                                         blade=blade,
-                                         station=station)
-        elif station == 'mean':
-            FlowVars = u.GetMeanFlowVars(stage=stage,
-                                         blade=blade,
-                                         station=station)
-        elif station == 'tip':
-            FlowVars = u.GetTipFlowVars(stage=stage,
-                                        blade=blade,
-                                        station=station)
-        avle, avte, rvle, rvte, v1, v2, radius = FlowVars
+        avle, avte, rvle, rvte, v1, v2, radius = ut.get_vars(stage=stage,
+                                                             blade=blade,
+                                                             station=station)
         cx = v1*m.cos(r(avle))
-        U = stage.rpm/60*2*m.pi*radius
+        u = stage.rpm/60*2*m.pi*radius
         ct2 = cx*m.tan(r(rvte))
         betam = d(m.atan((m.tan(r(avle)) + m.tan(r(avte)))/2))
 
@@ -170,12 +175,12 @@ class Airfoil():
 
         # Incidence, deviation, and blade angle calculation
         self.deflection = abs(avle - avte)
-        self.incidence, n_slope = u.Incidence(thickness=2*self.yt,
-                                              solidity=self.sigma,
-                                              relative_inlet_angle=rvle)
-        self.deviation, m_slope = u.Deviation(thickness=2*self.yt,
-                                              solidity=self.sigma,
-                                              relative_inlet_angle=rvle)
+        self.incidence, _n_slope = ut.calcincidence(thickness=2*self.yt,
+                                                    solidity=self.sigma,
+                                                    relative_inlet_angle=rvle)
+        self.deviation, _m_slope = ut.calcdeviation(thickness=2*self.yt,
+                                                    solidity=self.sigma,
+                                                    relative_inlet_angle=rvle)
         self.blade_angle_i = avle - self.incidence
         self.blade_angle_e = avte - self.deviation
         self.camber = abs(self.blade_angle_i - self.blade_angle_e)
@@ -203,19 +208,19 @@ class Airfoil():
         self.yc = self.ycr*self.xc*abs(m.tan(r(self.cle)))
 
         # Assume NACA 4 curvature
-        self.kc, self.kt = u.Curvatures(xc=self.xc, yc=self.yc,
-                                        xt=self.xt, yt=self.yt)
+        self.kc, self.kt = ut.curvatures(xc=self.xc, yc=self.yc,
+                                         xt=self.xt, yt=self.yt)
 
-        self.bc, self.bt = u.Beziers(xc=self.xc, yc=self.yc, kc=self.kc,
-                                     xt=self.xt, yt=self.yt, kt=self.kt,
-                                     cle=self.cle, cte=self.cte, rle=self.rle,
-                                     blade=blade, station=station)
+        self.bc, self.bt = ut.beziers(xc=self.xc, yc=self.yc, kc=self.kc,
+                                      xt=self.xt, yt=self.yt, kt=self.kt,
+                                      cle=self.cle, cte=self.cte, rle=self.rle,
+                                      blade=blade, station=station)
         airfoil_name = blade + '_' + station
-        wf.Airfoil.CreateFile(filename=airfoil_name, plot=plotAirfoil,
-                              xc=self.xc, yc=self.yc, kc=self.kc, bc=self.bc,
-                              xt=self.xt, yt=self.yt, kt=self.kt, bt=self.bt,
-                              cle=self.cle, cte=self.cte,
-                              rle=self.rle, wte=self.wte)
+        wf.create_coord_file(filename=airfoil_name, plot=plot_airfoil,
+                             xc=self.xc, yc=self.yc, kc=self.kc, bc=self.bc,
+                             xt=self.xt, yt=self.yt, kt=self.kt, bt=self.bt,
+                             cle=self.cle, cte=self.cte,
+                             wte=self.wte, rle=self.rle)
 
         self.Re = self.rho*v1*self.chord/self.mu
         self.polar = xf.find_coefficients(airfoil=airfoil_name, indir='Input',
@@ -236,15 +241,15 @@ class Airfoil():
             # self.sv['y'].append(self.cp['y'][i])
             self.sv['v'].append(m.sqrt(1 - self.cp['Cp'][i]))
 
-        if plotCp:
+        if plot_cp:
             plt.plot(self.cp['x'], self.cp['Cp'])
             plt.show()
 
-        if plotSv:
+        if plot_sv:
             plt.plot(self.sv['x'], self.sv['v'])
             plt.show()
 
-        if plotPolar:
+        if plot_ploar:
             # Gather multiple angles of attack for airfoil and get polars
             alphas = list(range(-30, 30))
             polars = xf.find_coefficients(airfoil=airfoil_name,
@@ -261,9 +266,9 @@ class Airfoil():
             cl = self.polar['CL']
             cd = self.polar['CD']
             gamma = m.atan(cd/cl)
-            self._psi = (((cx/U)/2)*u.Sec(r(betam))*self.sigma
+            self._psi = (((cx/u)/2)*ut.sec(r(betam))*self.sigma
                          * (cl + cd*m.tan(r(betam))))
-            self.psi_opt = (((cx/U)/m.sqrt(2))*self.sigma*(cl + cd))
+            self.psi_opt = (((cx/u)/m.sqrt(2))*self.sigma*(cl + cd))
 
             self.dX = ((self.rho*cx**2*self.chord*cl
                         / (2*m.cos(r(betam))**2))
@@ -274,13 +279,13 @@ class Airfoil():
             self.delta_p = cl*((self.rho*cx**2*self.chord
                                 / (2*self.space*m.cos(r(betam))**2))
                                * m.sin(r(betam) - gamma)/m.cos(gamma))
-            self.delta_T = (cl/1.005)*((U*cx*self.chord
+            self.delta_T = (cl/1.005)*((u*cx*self.chord
                                         / (2*self.space*m.cos(r(betam))**2))
                                        * m.cos(r(betam) - gamma)/m.cos(gamma))
-            self.efficiency = (cx/U)*m.tan(r(betam) - gamma) + ct2/(2*U)
+            self.efficiency = (cx/u)*m.tan(r(betam) - gamma) + ct2/(2*u)
         except TypeError:
             print('Design point did not converge in xfoil.')
-            pass
+            # pass
 
         print(f'{station} {blade} Performance')
         print(f'    DF: {self.df:.2f} (<=0.6)')
@@ -290,40 +295,40 @@ class Airfoil():
         print('\n')
 
 
-class Blade():
+@dataclass
+class Blade:
     """Set blade properties."""
 
-    def __init__(self):
-        """Instantiate blade properties."""
-        self.root = Airfoil()
-        self.mean = Airfoil()
-        self.tip = Airfoil()
+    root: ClassVar = Airfoil()
+    mean: ClassVar = Airfoil()
+    tip: ClassVar = Airfoil()
 
-        self.z = 0
+    z: float = 0
+    hub: float = 0
 
-    def GetBladeConfig(self, filename: str):
+    def get_blade_config(self, filename: str):
         """Read .ini files."""
-        self.root.GetAirfoilConfig(filename, 'root')
-        self.mean.GetAirfoilConfig(filename, 'mean')
-        self.tip.GetAirfoilConfig(filename, 'tip')
+        self.root.get_airfoil_config(filename, 'root')
+        self.mean.get_airfoil_config(filename, 'mean')
+        self.tip.get_airfoil_config(filename, 'tip')
 
-        cfp = ConfigParser()
         file = pth.Path(f'Config/{filename}')
-        cfp.read(file)
+        config = ConfigParser()
+        config.read(file)
 
-        self.z = cfp.getfloat('blade', 'z')
-        self.hub = cfp.getfloat('blade', 'hub')
+        self.z = config.getfloat('blade', 'z')
+        self.hub = config.getfloat('blade', 'hub')
 
-    def CalcBlade(self, stage, blade: str,
-                  plotAirfoil=False, plotPolar=False,
-                  plotCp=False, plotSv=False):
+    def calcblade(self, stage, blade: str,
+                  plot_airfoil=False, plot_ploar=False,
+                  plot_cp=False, plot_sv=False):
         """Calculate blade properties."""
-        self.root.CalcAirfoil(stage, blade, 'root',
-                              plotAirfoil=plotAirfoil, plotPolar=plotPolar,
-                              plotCp=plotCp, plotSv=plotSv)
-        self.mean.CalcAirfoil(stage, blade, 'mean',
-                              plotAirfoil=plotAirfoil, plotPolar=plotPolar,
-                              plotCp=plotCp, plotSv=plotSv)
-        self.tip.CalcAirfoil(stage, blade, 'tip',
-                             plotAirfoil=plotAirfoil, plotPolar=plotPolar,
-                             plotCp=plotCp, plotSv=plotSv)
+        self.root.calcairfoil(stage, blade, 'root',
+                              plot_airfoil=plot_airfoil, plot_ploar=plot_ploar,
+                              plot_cp=plot_cp, plot_sv=plot_sv)
+        self.mean.calcairfoil(stage, blade, 'mean',
+                              plot_airfoil=plot_airfoil, plot_ploar=plot_ploar,
+                              plot_cp=plot_cp, plot_sv=plot_sv)
+        self.tip.calcairfoil(stage, blade, 'tip',
+                             plot_airfoil=plot_airfoil, plot_ploar=plot_ploar,
+                             plot_cp=plot_cp, plot_sv=plot_sv)
