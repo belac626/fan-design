@@ -4,105 +4,56 @@ import pathlib as pth
 
 import utils as ut
 import write_file as wf
-
-COMPRESSOR = False
-
-if COMPRESSOR:
-    from comp_thermoflow import Stage
-    from comp_geo import Blade
-else:
-    from fan_flow import Stage
-    from fan_geo import Blade
+from fan_flow import Stage
+from fan_geo import Blade
 
 CWD = os.getcwd()
-if COMPRESSOR:
-    STAGE = Stage()
-    STAGE.get_stage_config(filename='Comp_Stage.ini')
-    STAGE.calcstage()
 
-    IGV = Blade()
-    IGV.get_blade_config(filename='Comp_IGV.ini')
-    IGV.calcblade(stage=STAGE, blade='IGV')
-    ROTOR = Blade()
-    ROTOR.get_blade_config(filename='Comp_Rotor.ini')
-    ROTOR.calcblade(stage=STAGE, blade='Rotor')
-    STATOR = Blade()
-    STATOR.get_blade_config(filename='Comp_Stator.ini')
-    STATOR.calcblade(stage=STAGE, blade='Stator')
+STAGE = Stage()
+STAGE.get_stage_config(filename='Stage.ini')
+STAGE.calcstage()
 
-    POD_DICT = {
-        'Pod chord': 12,
-        'Rotor chord': ROTOR.root.chord,
-        'Stator chord': STATOR.root.chord,
-        'ID': STAGE.root.radius*2,
-        'OD': STAGE.tip.radius*2,
-        'Shaft OD Nom.': 0.5,
-        'Shaft OD': '"Shaft OD Nom." + 0.1',
-        'Wall Thickness': 0.25,
-        'Pre Blades': 3,
-        'Blades': 3,
-        'Tip Clearance': 0.05,
-        'Chord': IGV.mean.chord,
-        'xt': IGV.mean.xt,
-        'yt': IGV.mean.yt,
-        'kt': IGV.mean.kt,
-        'xc': IGV.mean.xc,
-        'yc': IGV.mean.yc,
-        'kc': IGV.mean.kc,
-        'rle': IGV.mean.rle,
-        'cle': abs(IGV.mean.cle),
-        'cte': abs(IGV.mean.cte),
-        'wte': IGV.mean.wte,
-        'bt': IGV.mean.bt,
-        'bc': IGV.mean.bc,
-        'Stagger': IGV.mean.stagger
-    }
-else:
-    STAGE = Stage()
-    STAGE.get_stage_config(filename='Fan_Stage.ini')
-    STAGE.calcstage()
+IGV = Blade()
+IGV.get_blade_config(filename='IGV.ini')
+IGV.mean.rle = 1.1019*(2*IGV.mean.yt)**2
+IGV.mean.kt = ut.thicknesscurvature(IGV.mean.xt, IGV.mean.yt)
+IGV.mean.bt = ut.thicknessbezier(IGV.mean.xt, IGV.mean.yt,
+                                 IGV.mean.kt, IGV.mean.rle,
+                                 blade='IGV', station='mean')
+ROTOR = Blade()
+ROTOR.get_blade_config(filename='Rotor.ini')
+ROTOR.calcblade(stage=STAGE, blade='Rotor')
+STATOR = Blade()
+STATOR.get_blade_config(filename='Stator.ini')
+STATOR.calcblade(stage=STAGE, blade='Stator')
 
-    IGV = Blade()
-    IGV.get_blade_config(filename='Fan_IGV.ini')
-    IGV.mean.rle = 1.1019*(2*IGV.mean.yt)**2
-    IGV.mean.kt = ut.thicknesscurvature(IGV.mean.xt, IGV.mean.yt)
-    IGV.mean.bt = ut.thicknessbezier(IGV.mean.xt, IGV.mean.yt,
-                                     IGV.mean.kt, IGV.mean.rle,
-                                     blade='IGV', station='mean')
-    ROTOR = Blade()
-    ROTOR.get_blade_config(filename='Fan_Rotor.ini')
-    ROTOR.calcblade(stage=STAGE, blade='Rotor')
-    STATOR = Blade()
-    STATOR.get_blade_config(filename='Fan_OSV.ini')
-    STATOR.calcblade(stage=STAGE, blade='OSV')
-
-    POD_DICT = {
-        'Pod chord': 12,
-        'Rotor chord': ROTOR.root.chord/0.0254,
-        'Stator chord': STATOR.root.chord/0.0254,
-        'ID': STAGE.root.radius*2/0.0254,
-        'OD': STAGE.tip.radius*2/0.0254,
-        'Shaft OD Nom.': 0.5,
-        'Shaft OD': '"Shaft OD Nom." + 0.1',
-        'Wall Thickness': 0.25,
-        'Pre Blades': 3,
-        'Blades': 3,
-        'Tip Clearance': 0.05,
-        # 'Chord': IGV.mean.chord,
-        'xt': IGV.mean.xt,
-        'yt': IGV.mean.yt,
-        'kt': IGV.mean.kt,
-        # 'xc': IGV.mean.xc,
-        # 'yc': IGV.mean.yc,
-        # 'kc': IGV.mean.kc,
-        'rle': IGV.mean.rle,
-        # 'cle': abs(IGV.mean.cle),
-        # 'cte': abs(IGV.mean.cte),
-        # 'wte': igb.mean.wte,
-        'bt': IGV.mean.bt,
-        # 'bc': IGV.mean.bc,
-        # 'Stagger': IGV.mean.stagger
-    }
+POD_DICT = {
+    'Pod chord': 12,
+    'Rotor chord': ROTOR.root.chord/0.0254,
+    'Stator chord': STATOR.root.chord/0.0254,
+    'ID': STAGE.root.radius*2/0.0254,
+    'OD': STAGE.tip.radius*2/0.0254,
+    'Shaft OD Nom.': 0.5,
+    'Shaft OD': '"Shaft OD Nom." + 0.1',
+    'Wall Thickness': 0.25,
+    'Pre Blades': 3,
+    'Blades': 3,
+    'Tip Clearance': 0.05,
+    # 'Chord': IGV.mean.chord,
+    'xt': IGV.mean.xt,
+    'yt': IGV.mean.yt,
+    'kt': IGV.mean.kt,
+    # 'xc': IGV.mean.xc,
+    # 'yc': IGV.mean.yc,
+    # 'kc': IGV.mean.kc,
+    'rle': IGV.mean.rle,
+    # 'cle': abs(IGV.mean.cle),
+    # 'cte': abs(IGV.mean.cte),
+    # 'wte': igb.mean.wte,
+    'bt': IGV.mean.bt,
+    # 'bc': IGV.mean.bc,
+    # 'Stagger': IGV.mean.stagger
+}
 
 os.chdir('..')
 POD_FILE = pth.Path('Solidworks/Vars/Pod.txt')

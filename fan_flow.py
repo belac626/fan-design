@@ -16,11 +16,10 @@
 import math as m
 import pathlib as pth
 from configparser import ConfigParser
+from dataclasses import dataclass
 from math import degrees as d
 from math import radians as r
 from typing import ClassVar
-
-from dataclasses import dataclass
 
 ################################
 # #Class: ThermoFlow
@@ -84,6 +83,32 @@ class FanFlow:
     ct1: float = 0
     ct2: float = 0
 
+    mach: float = 0
+    re: float = 0
+
+    t1: float = 0
+    t2: float = 0
+    t01: float = 0
+    t02: float = 0
+    p1: float = 0
+    p2: float = 0
+    p01: float = 0
+    p02: float = 0
+
+    RHO: float = 1.177
+    MU: float = 1.8*10**(-5)
+    CP: float = 1005
+    CV: float = 718
+    GAMMA: float = CP*CV
+    R: float = CP - CV
+
+    dt0: float = 0
+    pr: float = 0
+    cp: float = 0
+    work: float = 0
+    torque: float = 0
+    capacity: float = 0
+
     def get_fan_flow_config(self, filename: str, station: str):
         """Read .ini file."""
         file = pth.Path(f'{pth.Path.cwd()}/Config/{filename}')
@@ -101,6 +126,9 @@ class FanFlow:
                                   + config.getfloat('tip', 'radius')**2)/2)
         else:
             self.radius = config.getfloat(station, 'radius')
+
+        self.p1 = config.getfloat('thermo', 'p1')
+        self.t1 = config.getfloat('thermo', 'T1')
 
     def calc_fan_flow(self, iphi=None):
         """Calculate flow angles."""
@@ -126,6 +154,33 @@ class FanFlow:
         self.ct1 = self.c1*m.sin(r(self.alpha1))
         self.ct2 = self.c2*m.sin(r(self.alpha2))
 
+        # Thermodynamics
+        self.mach = self.cx/m.sqrt(self.GAMMA*self.R*self.t1)
+        self.dt0 = self.psi*(self.u)**2/self.CP
+
+        self.t01 = self.t1*(1 + ((self.GAMMA - 1)*self.mach**2)/2)
+        self.p01 = self.p1*(1 + ((self.GAMMA - 1)*self.mach**2)/2)\
+            ** (self.GAMMA/(self.GAMMA - 1))
+        self.t02 = self.t01 + self.dt0
+        self.p02 = self.p01*(self.t02/self.t01)**(self.GAMMA/(self.GAMMA - 1))
+        self.t2 = self.t02/(1 + ((self.GAMMA - 1)*self.mach**2)/2)
+        self.p2 = self.p02/((1 + ((self.GAMMA - 1)*self.mach**2)/2)
+                            ** (self.GAMMA/(self.GAMMA - 1)))
+
+        self.eta_p = ((self.GAMMA - 1)/self.GAMMA)\
+            * m.log(self.p2/self.p1)/m.log(self.t2/self.t1)
+        self.eta_c = ((self.p02/self.p01)**(self.GAMMA/(self.GAMMA - 1)) - 1)\
+            / (self.dt0/self.t01)
+        self.pr = (1 + (self.dt0/self.t01))\
+            ** (self.GAMMA*self.eta_p/(self.GAMMA-1))
+        self.cp = (self.p2 - self.p1)/(self.p01 - self.p1)
+        self.work = self.CP*self.dt0
+        self.torque = self.work/(self.u/self.radius)
+        self.capacity = self.GAMMA/m.sqrt(self.GAMMA - 1)*self.mach\
+            * (1 + (self.GAMMA - 1)/2*self.mach**2)\
+            ** (-(1/2)*(self.GAMMA + 1)/(self.GAMMA - 1))
+
+
 ################################
 # #Class: Stage
 # Holds stage characteristics
@@ -149,6 +204,22 @@ class Stage:
 
     rpm: float = 0
     span: float = 0
+
+    m_dot: float = 0
+
+    RHO: float = 1.177
+    MU: float = 1.8*10**(-5)
+    CP: float = 1005
+    CV: float = 718
+    GAMMA: float = CP*CV
+    R: float = CP - CV
+
+    dt0: float = 0
+    pr: float = 0
+    cp: float = 0
+    work: float = 0
+    torque: float = 0
+    capacity: float = 0
 
     def get_stage_config(self, filename: str):
         """Read .inp files."""
@@ -191,3 +262,21 @@ class Stage:
                 hphi = tip_phi
             tip_phi = (hphi + lphi)/2
             self.tip.calc_fan_flow(iphi=tip_phi)
+
+        self.dt0 = self.mean.dt0
+        self.pr = self.mean.pr
+        self.cp = self.mean.cp
+        self.work = self.mean.work
+        self.torque = self.mean.torque
+        self.m_dot = self.RHO*self.mean.cx*m.pi*(self.tip.radius**2
+                                                 - self.root.radius**2)
+
+        print('\n')
+        print('Mean Stage Properties')
+        print(f'    m  : {self.m_dot:.2f} kg/s')
+        print(f'    dT0: {self.dt0:.2f} K')
+        print(f'    PR : {self.pr:.2f}')
+        print(f'    Cp : {self.cp:.2f}')
+        print(f'    W  : {self.work*self.m_dot/1000:.2f} kW')
+        print(f'    torque: {self.torque*self.m_dot:.2f} Nm')
+        print('\n')

@@ -162,7 +162,6 @@ class Airfoil:
                                                              station=station)
         cx = v1*m.cos(r(avle))
         u = stage.rpm/60*2*m.pi*radius
-        ct2 = cx*m.tan(r(rvte))
         betam = d(m.atan((m.tan(r(avle)) + m.tan(r(avte)))/2))
 
         self.dh = v2/v1
@@ -285,7 +284,8 @@ class Airfoil:
             self.delta_T = (cl/1.005)*((u*cx*self.chord
                                         / (2*self.space*m.cos(r(betam))**2))
                                        * m.cos(r(betam) - gamma)/m.cos(gamma))
-            self.efficiency = (cx/u)*m.tan(r(betam) - gamma) + ct2/(2*u)
+            self.efficiency = (cx/u)*m.tan(r(betam) - gamma)\
+                + cx*m.tan(r(rvte))/(2*u)
         except TypeError:
             print('Design point did not converge in xfoil.')
             # pass

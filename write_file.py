@@ -24,9 +24,11 @@ from math import radians as r
 import matplotlib.collections as mc
 import matplotlib.pyplot as plt
 import numpy as np
-import pylab as pl
 
 import utils as ut
+
+# import pylab as pl - used in line 137 only... trying plt instead
+
 
 project = os.getcwd()
 
@@ -134,7 +136,7 @@ def create_coord_file(filename: str, plot: bool,
 
     if plot:
         lc = mc.LineCollection(lines)
-        _, ax = pl.subplots()
+        _, ax = plt.subplots()
         ax.add_collection(lc)
         plt.scatter(c['x'], c['yC'], color='red', marker='^')
         plt.scatter(c['x'], c['yT'], color='blue', marker='^')
