@@ -70,9 +70,8 @@ wf.write_sw_config(stage=STAGE, blade=ROTOR, filename='Rotor.txt')
 
 wf.write_sw_config(stage=STAGE, blade=STATOR, filename='Stator.txt')
 
+wf.DumpVars.dump_stage_csv(filename='Stage_dump.csv', stage=STAGE)
 wf.DumpVars.dump_blade_csv(filename='Blade_dump.csv',
-                           rotor=ROTOR, stator=STATOR)
-wf.DumpVars.dump_stage_csv(filename='Stage_dump.csv',
-                           stage=STAGE)
+                           igv=IGV, rotor=ROTOR, stator=STATOR)
 wf.DumpVars.dump_json(filename='Vars_dump.json',
                       stage=STAGE, igv=IGV, rotor=ROTOR, stator=STATOR)

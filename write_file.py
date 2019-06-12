@@ -189,49 +189,62 @@ class DumpVars():
         """Instantiate dump properties."""
 
     @staticmethod
-    def dump_blade_csv(filename, rotor, stator):
+    def dump_blade_csv(filename, igv, rotor, stator):
         """Write blade variables in CSV format."""
+        blade_vals = {'igv': {'root': [],
+                              'mean': [],
+                              'tip': []},
+                      'rotor': {'root': [],
+                                'mean': [],
+                                'tip': []},
+                      'stator': {'root': [],
+                                 'mean': [],
+                                 'tip': []}}
+        blade_keys = []
+        blades = ['igv', 'rotor', 'stator']
+        stations = ['root', 'mean', 'tip']
+        blade_dicts = {'igv': {'root': igv.root.__dict__,
+                               'mean': igv.mean.__dict__,
+                               'tip': igv.tip.__dict__},
+                       'rotor': {'root': rotor.root.__dict__,
+                                 'mean': rotor.mean.__dict__,
+                                 'tip': rotor.tip.__dict__},
+                       'stator': {'root': stator.root.__dict__,
+                                  'mean': stator.mean.__dict__,
+                                  'tip': stator.tip.__dict__}}
+        blade_polar_dicts = {'igv': {'root': igv.root.polar,
+                                     'mean': igv.mean.polar,
+                                     'tip': igv.tip.polar},
+                             'rotor': {'root': rotor.root.polar,
+                                       'mean': rotor.mean.polar,
+                                       'tip': rotor.tip.polar},
+                             'stator': {'root': stator.root.polar,
+                                        'mean': stator.mean.polar,
+                                        'tip': stator.tip.polar}}
+
+        for key, val in rotor.root.__dict__.items():
+            blade_keys.append(key)
+        blade_keys.pop(-6)
+
+        for key, val in rotor.root.polar.items():
+            blade_keys.append(key)
+        data_by_row = [blade_keys]
+
+        for bld in blades:
+            for stn in stations:
+                for key, val in blade_dicts[bld][stn].items():
+                    blade_vals[bld][stn].append(val)
+                blade_vals[bld][stn].pop(-6)
+                for key, val in blade_polar_dicts[bld][stn].items():
+                    blade_vals[bld][stn].append(val)
+                data_by_row.append(blade_vals[bld][stn])
+        data_by_column = list(zip(*data_by_row))
+        fieldnames = ['DATA',
+                      'igv_root', 'igv_mean', 'igv_tip',
+                      'rotor_root', 'rotor_mean', 'rotor_tip',
+                      'stator_root', 'stator_mean', 'stator_tip']
         os.chdir('Output')
         with open(filename, 'w', newline='') as csv_dump:
-            blade_vals = {'rotor': {'root': [],
-                                    'mean': [],
-                                    'tip': []},
-                          'stator': {'root': [],
-                                     'mean': [],
-                                     'tip': []}}
-            blade_keys = []
-            blades = ['rotor', 'stator']
-            stations = ['root', 'mean', 'tip']
-            blade_dicts = {'rotor': {'root': rotor.root.__dict__,
-                                     'mean': rotor.mean.__dict__,
-                                     'tip': rotor.tip.__dict__},
-                           'stator': {'root': stator.root.__dict__,
-                                      'mean': stator.mean.__dict__,
-                                      'tip': stator.tip.__dict__}}
-            blade_polar_dicts = {'rotor': {'root': rotor.root.polar,
-                                           'mean': rotor.mean.polar,
-                                           'tip': rotor.tip.polar},
-                                 'stator': {'root': stator.root.polar,
-                                            'mean': stator.mean.polar,
-                                            'tip': stator.tip.polar}}
-            for key, val in rotor.root.__dict__.items():
-                blade_keys.append(key)
-            blade_keys.pop(-6)
-            for key, val in rotor.root.polar.items():
-                blade_keys.append(key)
-            data_by_row = [blade_keys]
-            for bld in blades:
-                for stn in stations:
-                    for key, val in blade_dicts[bld][stn].items():
-                        blade_vals[bld][stn].append(val)
-                    blade_vals[bld][stn].pop(-6)
-                    for key, val in blade_polar_dicts[bld][stn].items():
-                        blade_vals[bld][stn].append(val)
-                    data_by_row.append(blade_vals[bld][stn])
-            data_by_column = list(zip(*data_by_row))
-            fieldnames = ['DATA',
-                          'rotor_root', 'rotor_mean', 'rotor_tip',
-                          'stator_root', 'stator_mean', 'stator_tip']
             writer = csv.writer(csv_dump, delimiter=',', quotechar='"',
                                 quoting=csv.QUOTE_MINIMAL)
             writer.writerow(fieldnames)
@@ -243,23 +256,26 @@ class DumpVars():
     def dump_stage_csv(filename, stage):
         """Write stage variables in CSV format."""
         os.chdir('Output')
-        with open(filename, 'w', newline='') as csv_dump:
-            stage_vals = {'root': [], 'mean': [], 'tip': []}
-            stage_keys = []
-            stations = ['root', 'mean', 'tip']
-            stage_dicts = {'root': stage.root.__dict__,
-                           'mean': stage.mean.__dict__,
-                           'tip': stage.tip.__dict__}
+        stage_vals = {'root': [], 'mean': [], 'tip': []}
+        stage_keys = []
+        stations = ['root', 'mean', 'tip']
+        stage_dicts = {'root': stage.root.__dict__,
+                       'mean': stage.mean.__dict__,
+                       'tip': stage.tip.__dict__}
 
-            for key, val in stage.root.__dict__.items():
-                stage_keys.append(key)
-            data_by_row = [stage_keys]
-            for stn in stations:
-                for key, val in stage_dicts[stn].items():
-                    val = round(val, 4)
-                    stage_vals[stn].append(val)
-                data_by_row.append(stage_vals[stn])
-            fieldnames = ['DATA', 'stage_root', 'stage_mean', 'stage_tip']
+        for key, val in stage.root.__dict__.items():
+            stage_keys.append(key)
+        data_by_row = [stage_keys]
+
+        for stn in stations:
+            for key, val in stage_dicts[stn].items():
+                val = round(val, 4)
+                stage_vals[stn].append(val)
+            data_by_row.append(stage_vals[stn])
+
+        fieldnames = ['DATA', 'stage_root', 'stage_mean', 'stage_tip']
+
+        with open(filename, 'w', newline='') as csv_dump:
             writer = csv.writer(csv_dump, delimiter=',', quotechar='"',
                                 quoting=csv.QUOTE_MINIMAL)
             writer.writerow(fieldnames)
